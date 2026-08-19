@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ПрофНавигатор — прототип MVP</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--primary:#635bff;
+  --primary2:#4f46e5;--line:#e6e9f0;--soft:#eef0ff;--green:#16a34a;
+  --shadow:0 12px 35px rgba(30,41,59,.08);--radius:22px;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:var(--bg);line-height:1.5}
+button,input{font:inherit} button{cursor:pointer;border:0}
+.container{max-width:1120px;margin:auto;padding:0 24px}
+header{height:72px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.nav{height:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{font-weight:800;font-size:20px}.logo span{color:var(--primary)}
+nav{display:flex;gap:22px}nav a{color:var(--muted);text-decoration:none;font-size:14px}
+.btn{padding:13px 19px;border-radius:12px;font-weight:700;transition:.2s}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary2)}
+.btn-secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+.hero{padding:82px 0 72px;background:linear-gradient(180deg,#fff 0%,#f5f7fb 100%)}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.badge{display:inline-flex;background:var(--soft);color:var(--primary2);padding:7px 11px;border-radius:99px;font-weight:700;font-size:13px}
+h1{font-size:54px;line-height:1.04;letter-spacing:-2px;margin:18px 0}.lead{font-size:19px;color:var(--muted);max-width:650px}
+.actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}.meta{display:flex;gap:22px;color:var(--muted);font-size:13px;margin-top:20px}
+.hero-card,.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero-card{padding:28px}.mini-title{font-size:13px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.profile-score{display:flex;align-items:center;justify-content:space-between;margin:18px 0}.score{font-size:34px;font-weight:800;color:var(--primary)}
+.bar{height:9px;background:#edf0f5;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--primary);border-radius:inherit}
+section{padding:78px 0}.section-head{text-align:center;max-width:720px;margin:0 auto 38px}.section-head h2{font-size:36px;line-height:1.1;margin:0 0 12px;letter-spacing:-1px}.section-head p{color:var(--muted)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{padding:24px}.icon{width:42px;height:42px;border-radius:12px;background:var(--soft);display:grid;place-items:center;color:var(--primary);font-weight:800;margin-bottom:17px}
+.card h3{margin:0 0 8px}.card p{margin:0;color:var(--muted);font-size:14px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.step{padding:20px;border:1px solid var(--line);background:#fff;border-radius:16px}.num{font-weight:800;color:var(--primary);font-size:13px}
+.app{display:none;padding:40px 0 80px}.app.active{display:block}.app-shell{max-width:820px;margin:auto}.progress-top{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-bottom:9px}.progress{height:8px;background:#e9ecf2;border-radius:99px;overflow:hidden;margin-bottom:28px}.progress i{display:block;height:100%;background:var(--primary);transition:.3s}
+.test-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:34px;box-shadow:var(--shadow)}.test-card h2{margin-top:0}.question{font-size:24px;font-weight:750;margin:20px 0 24px}
+.options{display:grid;gap:10px}.option{width:100%;text-align:left;padding:16px;border:1px solid var(--line);background:#fff;border-radius:14px}.option:hover,.option.selected{border-color:var(--primary);background:var(--soft)}
+.range-row{display:grid;grid-template-columns:1fr 70px;gap:15px;align-items:center}.range-value{font-size:24px;font-weight:800;text-align:center;color:var(--primary)}
+input[type=range]{width:100%;accent-color:var(--primary)}
+.test-actions{display:flex;justify-content:space-between;margin-top:28px}
+.result{display:none}.result.active{display:block}.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.result-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px}.direction{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line)}.direction:last-child{border-bottom:0}.pct{font-weight:800;color:var(--primary)}
+.report-note{background:var(--soft);border-radius:16px;padding:18px;color:#38339a}
+footer{padding:30px 0;background:#111827;color:#cbd5e1;font-size:13px}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:30}.modal.show{display:flex}.modal-box{background:#fff;max-width:520px;width:100%;padding:30px;border-radius:22px}.modal-box h2{margin-top:0}.form{display:grid;gap:12px}.form input{padding:14px;border:1px solid var(--line);border-radius:12px}
+@media(max-width:800px){nav{display:none}.hero-grid,.result-grid{grid-template-columns:1fr}.grid4,.steps{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr}h1{font-size:42px}}
+@media(max-width:520px){.grid4,.steps{grid-template-columns:1fr}.hero{padding-top:50px}section{padding:55px 0}.test-card{padding:22px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <div class="logo">Проф<span>Навигатор</span></div>
+    <nav>
+      <a href="#approach">Как это работает</a>
+      <a href="#report">Пример отчёта</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="btn btn-primary" onclick="openModal()">Начать диагностику</button>
+  </div>
+</header>
+
+<main id="landing">
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="badge">Для подростков 13–17 лет</span>
+      <h1>Поможем понять, какие профессии действительно подходят вашему ребёнку</h1>
+      <p class="lead">Комплексная диагностика за несколько этапов: личность, интересы, тип деятельности и карьерные ценности. На выходе — понятный профиль и профессиональные направления.</p>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="openModal()">Начать диагностику</button>
+        <button class="btn btn-secondary" onclick="document.querySelector('#report').scrollIntoView({behavior:'smooth'})">Посмотреть пример отчёта</button>
+      </div>
+      <div class="meta"><span>✓ около 2 часов</span><span>✓ 4 измерения</span><span>✓ персональный результат</span></div>
+    </div>
+    <div class="hero-card">
+      <div class="mini-title">Пример профиля</div>
+      <div class="profile-score"><strong>Социальный</strong><span class="score">92%</span></div>
+      <div class="bar"><i style="width:92%"></i></div>
+      <div class="profile-score"><strong>Предпринимательский</strong><span class="score">86%</span></div>
+      <div class="bar"><i style="width:86%"></i></div>
+      <div class="profile-score"><strong>Исследовательский</strong><span class="score">81%</span></div>
+      <div class="bar"><i style="width:81%"></i></div>
+      <p style="color:var(--muted);font-size:14px;margin-top:22px">Результат объединяет данные диагностики, а не просто показывает оценку одного теста.</p>
+    </div>
+  </div>
+</section>
+
+<section id="approach">
+  <div class="container">
+    <div class="section-head"><h2>Одного теста недостаточно</h2><p>Профориентация должна учитывать ребёнка целиком.</p></div>
+    <div class="grid4">
+      <div class="card"><div class="icon">01</div><h3>Личность</h3><p>Как ребёнок думает, взаимодействует и организует свою деятельность.</p></div>
+      <div class="card"><div class="icon">02</div><h3>Интересы</h3><p>Какие области и темы действительно привлекают его внимание.</p></div>
+      <div class="card"><div class="icon">03</div><h3>Деятельность</h3><p>Какие типы профессиональных задач ему ближе по модели RIASEC.</p></div>
+      <div class="card"><div class="icon">04</div><h3>Ценности</h3><p>Что важно в будущей работе: доход, свобода, развитие, люди и другое.</p></div>
+    </div>
+  </div>
+</section>
+
+<section style="background:#fff">
+  <div class="container">
+    <div class="section-head"><h2>Как формируется результат</h2><p>Четыре измерения превращаются в единый профиль и рекомендации.</p></div>
+    <div class="steps">
+      <div class="step"><div class="num">ШАГ 1</div><h3>Диагностика</h3><p>Ребёнок отвечает на вопросы.</p></div>
+      <div class="step"><div class="num">ШАГ 2</div><h3>Профиль</h3><p>Система объединяет результаты.</p></div>
+      <div class="step"><div class="num">ШАГ 3</div><h3>Направления</h3><p>Формируется рейтинг подходящих направлений.</p></div>
+      <div class="step"><div class="num">ШАГ 4</div><h3>Маршрут</h3><p>Показывается, что изучать и куда двигаться дальше.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="report">
+  <div class="container">
+    <div class="section-head"><h2>Пример результата</h2><p>Не просто «вам подходит профессия», а объяснение — почему.</p></div>
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="mini-title">Top-5 направлений</div>
+        <div class="direction"><span>UX Research</span><span class="pct">92%</span></div>
+        <div class="direction"><span>Психология</span><span class="pct">89%</span></div>
+        <div class="direction"><span>Product Management</span><span class="pct">86%</span></div>
+        <div class="direction"><span>HR / People & Culture</span><span class="pct">84%</span></div>
+        <div class="direction"><span>Data Analytics</span><span class="pct">80%</span></div>
+      </div>
+      <div class="result-card">
+        <div class="mini-title">Почему подходит</div>
+        <p>• Любите исследовать и анализировать.</p>
+        <p>• Легко общаетесь с людьми.</p>
+        <p>• Интересно понимать мотивацию людей.</p>
+        <p>• Нравится решать сложные задачи.</p>
+        <p>• Важны свобода и возможность развития.</p>
+        <div class="report-note">Следующий шаг — подобрать образовательный маршрут: предметы → направление обучения → программы → профессии.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="background:#fff">
+  <div class="container">
+    <div class="section-head"><h2>Частые вопросы</h2><p>Прототип показывает ключевой пользовательский сценарий MVP.</p></div>
+    <div class="grid3">
+      <div class="card"><h3>Сколько занимает?</h3><p>Около 2 часов для полной комплексной диагностики.</p></div>
+      <div class="card"><h3>Кто проходит?</h3><p>Основной пользователь — подросток, покупатель и инициатор — родитель.</p></div>
+      <div class="card"><h3>Что в результате?</h3><p>Единый профиль, Top-5 направлений, объяснение рекомендаций и базовый образовательный маршрут.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<section id="app" class="app">
+  <div class="container app-shell">
+    <div class="progress-top"><span id="stepLabel">Шаг 1 из 4</span><span id="stepName">Личность</span></div>
+    <div class="progress"><i id="progressBar" style="width:25%"></i></div>
+    <div class="test-card" id="testCard"></div>
+  </div>
+</section>
+
+<section id="result" class="app">
+  <div class="container app-shell">
+    <div class="test-card">
+      <span class="badge">Диагностика завершена</span>
+      <h1 style="font-size:38px;letter-spacing:-1px">Профиль ребёнка</h1>
+      <p class="lead">SEI — Социальный, Предпринимательский, Исследовательский профиль.</p>
+      <div class="result-grid" style="margin-top:28px">
+        <div class="result-card"><div class="mini-title">RIASEC</div><h2>SEI</h2><p>Social · Enterprising · Investigative</p></div>
+        <div class="result-card"><div class="mini-title">Карьерные ценности</div><p>Развитие · Интересные задачи · Самостоятельность · Работа с людьми</p></div>
+      </div>
+      <div class="result-card" style="margin-top:18px">
+        <div class="mini-title">Подходящие направления</div>
+        <div class="direction"><span>UX Research</span><span class="pct">92%</span></div>
+        <div class="direction"><span>Психология</span><span class="pct">89%</span></div>
+        <div class="direction"><span>Product Management</span><span class="pct">86%</span></div>
+        <div class="direction"><span>HR / People & Culture</span><span class="pct">84%</span></div>
+        <div class="direction"><span>Data Analytics</span><span class="pct">80%</span></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="window.print()">Скачать отчёт (PDF)</button>
+        <button class="btn btn-secondary" onclick="navigator.clipboard?.writeText(location.href);alert('Ссылка на результат скопирована')">Поделиться отчётом</button>
+        <button class="btn btn-secondary" onclick="showLanding()">На главную</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="container">ПрофНавигатор · прототип MVP · Диагностика → профиль → направления → образовательный маршрут</div></footer>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h2>Начать диагностику</h2>
+    <p style="color:var(--muted)">Введите данные ребёнка, чтобы начать прототип сценария.</p>
+    <div class="form">
+      <input id="childName" placeholder="Имя ребёнка">
+      <input id="childAge" type="number" min="13" max="17" placeholder="Возраст">
+      <input id="parentEmail" type="email" placeholder="Email родителя">
+      <label style="font-size:13px;color:var(--muted)"><input type="checkbox" id="consent"> Я согласен(на) на обработку данных</label>
+      <button class="btn btn-primary" onclick="startTest()">Продолжить</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const steps=[
+ {name:"Личность",q:"Что ближе вашему ребёнку?",opts:["Мне легко общаться и знакомиться с людьми","Мне нравится анализировать и разбираться в сложном","Мне комфортно организовывать и планировать","Мне нравится пробовать новое и экспериментировать"]},
+ {name:"Карта интересов",q:"Насколько интересна область «Программирование и IT»?",range:true},
+ {name:"RIASEC",q:"Что больше похоже на предпочтительный тип деятельности?",opts:["Помогать людям и работать в команде","Исследовать, анализировать и находить закономерности","Создавать идеи, проекты и новые решения","Организовывать людей и добиваться результата"]},
+ {name:"Ценности",q:"Насколько важна самостоятельность в будущей работе?",range:true}
+];
+let current=0,answers={};
+
+function openModal(){document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function startTest(){
+ const name=document.getElementById('childName').value.trim(), age=+document.getElementById('childAge').value;
+ if(!name || age<13 || age>17 || !document.getElementById('consent').checked){alert('Заполните имя, возраст 13–17 лет и подтвердите согласие.');return}
+ closeModal(); document.getElementById('landing').style.display='none'; document.getElementById('app').classList.add('active'); renderStep();
+}
+function renderStep(){
+ const s=steps[current], card=document.getElementById('testCard');
+ document.getElementById('stepLabel').textContent=`Шаг ${current+1} из ${steps.length}`;
+ document.getElementById('stepName').textContent=s.name;
+ document.getElementById('progressBar').style.width=((current+1)/steps.length*100)+'%';
+ let body=`<div class="mini-title">${s.name}</div><div class="question">${s.q}</div>`;
+ if(s.range){
+   const val=answers[current]||3;
+   body+=`<div class="range-row"><input id="range" type="range" min="1" max="5" value="${val}" oninput="document.getElementById('rv').textContent=this.value"><div class="range-value" id="rv">${val}</div></div>
+   <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-top:8px"><span>Совсем не интересно</span><span>Очень интересно</span></div>`;
+ }else{
+   body+=`<div class="options">${s.opts.map((o,i)=>`<button class="option ${answers[current]===i?'selected':''}" onclick="selectOption(${i})">${o}</button>`).join('')}</div>`;
+ }
+ body+=`<div class="test-actions"><button class="btn btn-secondary" onclick="prevStep()" ${current===0?'disabled':''}>Назад</button><button class="btn btn-primary" onclick="nextStep()">Далее</button></div>`;
+ card.innerHTML=body;
+}
+function selectOption(i){answers[current]=i;renderStep()}
+function nextStep(){
+ if(steps[current].range) answers[current]=+document.getElementById('range').value;
+ if(answers[current]===undefined){alert('Выберите ответ, чтобы продолжить.');return}
+ if(current<steps.length-1){current++;renderStep()}else{document.getElementById('app').classList.remove('active');document.getElementById('result').classList.add('active');window.scrollTo(0,0)}
+}
+function prevStep(){if(current>0){if(steps[current].range)answers[current]=+document.getElementById('range').value;current--;renderStep()}}
+function showLanding(){document.getElementById('result').classList.remove('active');document.getElementById('landing').style.display='block';window.scrollTo(0,0)}
+</script>
+</body>
+</html>
