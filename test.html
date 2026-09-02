@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Профориентационный тест</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#f5f5f7;--card:#fff;--text:#171717;--muted:#737373;--line:#e6e6e6;--accent:#ffdd2d;--accent-hover:#f3cf00}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh}
+button{font:inherit;border:0;cursor:pointer}
+.app{width:100%;min-height:100vh;padding:24px}
+.container{width:min(720px,100%);margin:0 auto}
+.screen{min-height:calc(100vh - 48px);display:flex;align-items:center}
+.card{background:var(--card);border-radius:28px;padding:40px;box-shadow:0 4px 24px rgba(0,0,0,.05)}
+.start{text-align:center}
+.eyebrow{display:inline-block;background:#f0f0f0;border-radius:999px;padding:8px 12px;font-size:13px;font-weight:600;margin-bottom:22px}
+h1{font-size:clamp(34px,7vw,56px);line-height:1.02;letter-spacing:-.04em;margin:0 0 18px}
+.lead{font-size:19px;line-height:1.5;color:#555;max-width:560px;margin:0 auto 14px}
+.time{font-size:15px;color:var(--muted);margin-bottom:30px}
+.primary{background:var(--accent);color:#111;border-radius:16px;padding:16px 24px;font-weight:700;min-height:54px;transition:.15s}
+.primary:hover{background:var(--accent-hover)}
+.test-card{padding:28px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+.progress-text{font-size:14px;color:var(--muted);font-weight:600}
+.progress{height:7px;background:#ededed;border-radius:99px;overflow:hidden;margin-bottom:42px}
+.progress>div{height:100%;background:#111;border-radius:99px;transition:width .25s}
+.question-label{font-size:17px;font-weight:700;margin-bottom:16px}
+.question{font-size:clamp(25px,5vw,37px);line-height:1.16;letter-spacing:-.025em;margin:0 0 28px}
+.answers{display:grid;gap:10px}
+.answer{width:100%;text-align:left;background:#fafafa;border:2px solid transparent;border-radius:16px;padding:16px 18px;min-height:58px;display:flex;align-items:center;gap:12px;transition:.15s}
+.answer:hover{background:#f1f1f1}
+.answer.selected{border-color:#111;background:#f0f0f0}
+.radio{width:22px;height:22px;border:2px solid #aaa;border-radius:50%;flex:0 0 22px;position:relative}
+.selected .radio{border-color:#111}
+.selected .radio:after{content:"";position:absolute;inset:4px;background:#111;border-radius:50%}
+.answer-text{font-size:16px;line-height:1.3}
+.actions{display:flex;justify-content:space-between;gap:12px;margin-top:24px}
+.secondary{background:#eee;border-radius:14px;padding:13px 18px;font-weight:700;min-height:50px}
+.secondary:disabled{opacity:.35;cursor:not-allowed}
+.actions .primary{margin-left:auto;min-width:130px}
+.result-head{text-align:center;margin-bottom:30px}
+.result-head h1{font-size:clamp(34px,7vw,50px)}
+.result-sub{color:#666;font-size:17px;line-height:1.5;margin:0}
+.results{display:grid;gap:14px;margin-bottom:30px}
+.result-item{background:#fafafa;border-radius:20px;padding:20px}
+.result-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:9px}
+.result-name{font-size:20px;font-weight:750}
+.result-score{font-size:18px;font-weight:750}
+.result-bar{height:9px;background:#e6e6e6;border-radius:99px;overflow:hidden;margin-bottom:13px}
+.result-bar div{height:100%;background:#111;border-radius:99px}
+.result-desc{margin:0;color:#666;line-height:1.45;font-size:15px}
+.cta{background:#111;color:#fff;border-radius:22px;padding:25px;margin:4px 0 20px}
+.cta h2{font-size:23px;margin:0 0 10px;letter-spacing:-.02em}
+.cta p{color:#cfcfcf;line-height:1.5;margin:0 0 20px}
+.cta .primary{width:100%}
+.restart{display:block;margin:0 auto;background:transparent;color:#555;text-decoration:underline;padding:8px}
+.hidden{display:none!important}
+@media(max-width:600px){
+.app{padding:12px}.screen{min-height:calc(100vh - 24px);align-items:flex-start}.card{border-radius:22px;padding:24px 18px;margin:12px 0}.start{margin-top:8vh}.test-card{padding:20px 16px}.progress{margin-bottom:30px}.question{margin-bottom:22px}.answer{padding:14px 14px}.actions{position:sticky;bottom:0;background:#fff;padding-top:12px}.result-item{padding:17px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="container">
+    <section id="startScreen" class="screen">
+      <div class="card start">
+        <div class="eyebrow">Профориентация · 5–7 минут</div>
+        <h1>Что тебе интересно?</h1>
+        <p class="lead">Короткий тест поможет понять, какие виды деятельности тебе особенно интересны. Здесь нет правильных или неправильных ответов — выбирай то, что ближе тебе.</p>
+        <div class="time">50 вопросов · отвечай интуитивно</div>
+        <button class="primary" onclick="startTest()">Начать тест</button>
+      </div>
+    </section>
+
+    <section id="testScreen" class="screen hidden">
+      <div class="card test-card">
+        <div class="topbar">
+          <span class="progress-text" id="progressText">Вопрос 1 из 50</span>
+        </div>
+        <div class="progress"><div id="progressBar" style="width:2%"></div></div>
+        <div class="question-label">Насколько тебе было бы интересно заниматься таким делом?</div>
+        <h2 class="question" id="questionText"></h2>
+        <div class="answers" id="answers"></div>
+        <div class="actions">
+          <button class="secondary" id="backBtn" onclick="previousQuestion()">Назад</button>
+          <button class="primary" id="nextBtn" onclick="nextQuestion()" disabled>Далее</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="screen hidden">
+      <div class="card">
+        <div class="result-head">
+          <div class="eyebrow">Твой результат</div>
+          <h1>Вот что тебе интересно</h1>
+          <p class="result-sub">Похоже, тебе особенно интересны эти виды деятельности. Это может быть хорошей точкой для изучения разных профессиональных направлений.</p>
+        </div>
+        <div class="results" id="results"></div>
+        <div class="cta">
+          <h2>А что это значит для будущей профессии?</h2>
+          <p>Интересы — только одна часть профиля. Чтобы понять, какие профессиональные направления могут тебе подойти, нужно посмотреть ещё на особенности личности, ценности и предпочтительную рабочую среду.</p>
+          <button class="primary" onclick="alert('Демонстрационная кнопка: подробный разбор пока недоступен.')">Получить подробный разбор</button>
+        </div>
+        <button class="restart" onclick="restartTest()">Пройти ещё раз</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const categories = [{"code":"RES","name":"Исследовать","description":"Узнавать новое, искать причины, проверять гипотезы, наблюдать и экспериментировать."},{"code":"SYS","name":"Понимать системы","description":"Находить закономерности, разбирать сложное на части, понимать логику и улучшать системы."},{"code":"CRE","name":"Создавать","description":"Придумывать новое, искать разные решения, менять привычное и создавать собственные идеи."},{"code":"TEC","name":"Конструировать","description":"Собирать, настраивать, разбирать устройства, работать с инструментами и технологиями."},{"code":"BIO","name":"Изучать живое","description":"Понимать человека, животных, растения и другие живые системы."},{"code":"HEL","name":"Развивать и помогать","description":"Помогать людям, объяснять, обучать, развивать навыки и искать индивидуальные решения."},{"code":"INF","name":"Влиять и взаимодействовать","description":"Обсуждать, убеждать, договариваться, выступать и вести людей к общей цели."},{"code":"ART","name":"Выражать","description":"Передавать идеи и настроение через визуальные образы, тексты, музыку, сюжеты и эстетику."},{"code":"ORG","name":"Организовывать","description":"Планировать, структурировать, распределять ресурсы, координировать задачи и проекты."}];
+const questions = [{"id":"RES-01","scale":"RES","category":"Исследовать","text":"Тебе интересно узнавать, почему привычные вещи работают именно так?","type":"interest"},{"id":"TEC-01","scale":"TEC","category":"Конструировать","text":"Тебе нравится собирать что-нибудь из отдельных деталей?","type":"interest"},{"id":"INF-01","scale":"INF","category":"Влиять и взаимодействовать","text":"Тебе нравится объяснять свою позицию так, чтобы другой человек её понял и принял?","type":"interest"},{"id":"SYS-01","scale":"SYS","category":"Понимать системы","text":"Тебе нравится находить правило, по которому устроена последовательность или задача?","type":"interest"},{"id":"ORG-01","scale":"ORG","category":"Организовывать","text":"Тебе нравится заранее продумывать шаги, которые нужно сделать для достижения результата?","type":"interest"},{"id":"BIO-01","scale":"BIO","category":"Изучать живое","text":"Тебе интересно разбираться, что происходит с организмом человека в разных ситуациях?","type":"interest"},{"id":"ART-01","scale":"ART","category":"Выражать","text":"Тебе нравится превращать идею в рисунок, изображение или визуальный образ?","type":"interest"},{"id":"CRE-01","scale":"CRE","category":"Создавать","text":"Тебе нравится придумывать несколько разных вариантов решения одной задачи?","type":"interest"},{"id":"CTRL-01","scale":null,"category":"Контроль","text":"Тебе интересно разбираться, почему что-то произошло, если причина сразу непонятна?","type":"control","controlScale":"RES"},{"id":"HEL-01","scale":"HEL","category":"Развивать и помогать","text":"Тебе интересно вместе с человеком искать способ справиться с его трудностью?","type":"interest"},{"id":"RES-03","scale":"RES","category":"Исследовать","text":"Тебе нравится экспериментировать, меняя что-то одно, чтобы посмотреть, что произойдет?","type":"interest"},{"id":"TEC-03","scale":"TEC","category":"Конструировать","text":"Тебе было бы интересно использовать инструменты или технологии, чтобы что-то собрать или изменить?","type":"interest"},{"id":"INF-03","scale":"INF","category":"Влиять и взаимодействовать","text":"Тебе было бы интересно выступить перед группой и рассказать о своей идее?","type":"interest"},{"id":"SYS-03","scale":"SYS","category":"Понимать системы","text":"Тебе нравится выстраивать рассуждение шаг за шагом, чтобы прийти к ответу?","type":"interest"},{"id":"ORG-03","scale":"ORG","category":"Организовывать","text":"Тебе было бы интересно организовать работу нескольких людей над общей задачей?","type":"interest"},{"id":"BIO-03","scale":"BIO","category":"Изучать живое","text":"Тебе интересно разбираться, почему растения, животные или природные системы меняются?","type":"interest"},{"id":"ART-03","scale":"ART","category":"Выражать","text":"Тебе нравится создавать или подбирать музыку и звуки, чтобы передать определённое настроение?","type":"interest"},{"id":"CRE-03","scale":"CRE","category":"Создавать","text":"Тебе хочется изменить привычную вещь, чтобы она стала удобнее или интереснее?","type":"interest"},{"id":"CTRL-03","scale":null,"category":"Контроль","text":"Тебе интересно помогать другому человеку разобраться в том, что ему пока сложно понять?","type":"control","controlScale":"HEL"},{"id":"HEL-03","scale":"HEL","category":"Развивать и помогать","text":"Тебе интересно искать простое объяснение для человека, которому что-то пока непонятно?","type":"interest"},{"id":"RES-05","scale":"RES","category":"Исследовать","text":"Если что-то неожиданно произошло, тебе хочется разобраться, что именно к этому привело?","type":"interest"},{"id":"TEC-05","scale":"TEC","category":"Конструировать","text":"Тебе интересно искать причину неисправности и пробовать восстановить работу вещи?","type":"interest"},{"id":"INF-05","scale":"INF","category":"Влиять и взаимодействовать","text":"Тебе интересно обсуждать разные мнения и вместе приходить к общему решению?","type":"interest"},{"id":"SYS-05","scale":"SYS","category":"Понимать системы","text":"Если что-то можно сделать лучше, тебе интересно найти более эффективный способ?","type":"interest"},{"id":"ORG-05","scale":"ORG","category":"Организовывать","text":"Тебе интересно координировать разные задачи, чтобы большой проект двигался к результату?","type":"interest"},{"id":"BIO-05","scale":"BIO","category":"Изучать живое","text":"Тебе было бы интересно выяснять, как разные условия влияют на живые организмы?","type":"interest"},{"id":"ART-05","scale":"ART","category":"Выражать","text":"Тебе нравится подбирать цвета, формы и детали так, чтобы всё вместе выглядело гармонично?","type":"interest"},{"id":"CRE-05","scale":"CRE","category":"Создавать","text":"Тебе нравится пробовать разные варианты, пока не получится именно то, что ты задумал?","type":"interest"},{"id":"CTRL-05","scale":null,"category":"Контроль","text":"Тебе интересно понимать, как устроены сложные вещи и системы?","type":"control","controlScale":"SYS"},{"id":"HEL-05","scale":"HEL","category":"Развивать и помогать","text":"Тебе интересно разобраться, что именно нужно другому человеку, и придумать, как ему помочь?","type":"interest"},{"id":"RES-02","scale":"RES","category":"Исследовать","text":"Тебе нравится сначала предположить, почему что-то произошло, а потом проверить свою догадку?","type":"interest"},{"id":"TEC-02","scale":"TEC","category":"Конструировать","text":"Тебе интересно разбираться, как устроены механизмы и устройства внутри?","type":"interest"},{"id":"INF-02","scale":"INF","category":"Влиять и взаимодействовать","text":"Тебе интересно искать решение, которое устроит людей с разными мнениями?","type":"interest"},{"id":"SYS-02","scale":"SYS","category":"Понимать системы","text":"Тебе интересно разбирать сложную проблему на отдельные части, чтобы понять её?","type":"interest"},{"id":"ORG-02","scale":"ORG","category":"Организовывать","text":"Тебе интересно превращать большой объём информации в понятную структуру или список?","type":"interest"},{"id":"BIO-02","scale":"BIO","category":"Изучать живое","text":"Тебе интересно наблюдать за животными и разбираться, почему они ведут себя определённым образом?","type":"interest"},{"id":"ART-02","scale":"ART","category":"Выражать","text":"Тебе интересно придумывать тексты, описания или истории?","type":"interest"},{"id":"CRE-02","scale":"CRE","category":"Создавать","text":"Тебе интересно делать что-то по-своему, даже если уже существует привычный способ?","type":"interest"},{"id":"CTRL-02","scale":null,"category":"Контроль","text":"Тебе интересно придумывать новые способы решения привычных задач?","type":"control","controlScale":"CRE"},{"id":"HEL-02","scale":"HEL","category":"Развивать и помогать","text":"Тебе нравится объяснять другим то, что ты сам хорошо понял?","type":"interest"},{"id":"RES-04","scale":"RES","category":"Исследовать","text":"Тебе интересно наблюдать за происходящим, чтобы понять, как и почему оно меняется?","type":"interest"},{"id":"TEC-04","scale":"TEC","category":"Конструировать","text":"Тебе интересно настраивать устройство или систему, пока она не начнёт работать как нужно?","type":"interest"},{"id":"INF-04","scale":"INF","category":"Влиять и взаимодействовать","text":"Тебе интересно вести группу к общей цели и принимать решения, когда мнения участников расходятся?","type":"interest"},{"id":"SYS-04","scale":"SYS","category":"Понимать системы","text":"Тебе интересно искать закономерности, сравнивая разные факты или результаты?","type":"interest"},{"id":"ORG-04","scale":"ORG","category":"Организовывать","text":"Тебе интересно решать, как лучше распределить ограниченные время, деньги или другие ресурсы, чтобы получить нужный результат?","type":"interest"},{"id":"BIO-04","scale":"BIO","category":"Изучать живое","text":"Тебе интересно понимать, как разные живые организмы связаны друг с другом?","type":"interest"},{"id":"ART-04","scale":"ART","category":"Выражать","text":"Тебе интересно придумывать персонажей, сюжеты или целые вымышленные миры?","type":"interest"},{"id":"CRE-04","scale":"CRE","category":"Создавать","text":"Тебе нравится, когда после твоей идеи появляется что-то новое, чего раньше не было?","type":"interest"},{"id":"CTRL-04","scale":null,"category":"Контроль","text":"Тебе интересно планировать, что и в каком порядке нужно сделать для достижения результата?","type":"control","controlScale":"ORG"},{"id":"HEL-04","scale":"HEL","category":"Развивать и помогать","text":"Тебе было бы интересно помогать кому-то осваивать новый навык?","type":"interest"}];
+const scaleDescriptions = Object.fromEntries(categories.map(c => [c.code, c.description]));
+
+const answers = {};
+let currentIndex = 0;
+let results = [];
+
+function show(id){
+  ["startScreen","testScreen","resultScreen"].forEach(x => document.getElementById(x).classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function startTest(){
+  currentIndex = 0;
+  for(const key in answers) delete answers[key];
+  results = [];
+  show("testScreen");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = questions[currentIndex];
+  const total = questions.length;
+  document.getElementById("progressText").textContent = `Вопрос ${currentIndex + 1} из ${total}`;
+  document.getElementById("progressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
+  document.getElementById("questionText").textContent = q.text;
+
+  const labels = ["Очень интересно","Скорее интересно","Не знаю / зависит от ситуации","Скорее неинтересно","Совсем неинтересно"];
+  const box = document.getElementById("answers");
+  box.innerHTML = "";
+  labels.forEach((label,i) => {
+    const value = 5 - i;
+    const button = document.createElement("button");
+    button.className = "answer" + (answers[q.id] === value ? " selected" : "");
+    button.type = "button";
+    button.innerHTML = `<span class="radio"></span><span class="answer-text">${label}</span>`;
+    button.onclick = () => selectAnswer(value);
+    box.appendChild(button);
+  });
+
+  document.getElementById("backBtn").disabled = currentIndex === 0;
+  const next = document.getElementById("nextBtn");
+  next.disabled = answers[q.id] == null;
+  next.textContent = currentIndex === total - 1 ? "Получить результат" : "Далее";
+}
+
+function selectAnswer(value){
+  answers[questions[currentIndex].id] = value;
+  renderQuestion();
+}
+
+function nextQuestion(){
+  if(answers[questions[currentIndex].id] == null) return;
+  if(currentIndex < questions.length - 1){
+    currentIndex++;
+    renderQuestion();
+  } else {
+    calculateResults();
+    renderResults();
+    show("resultScreen");
+    window.scrollTo(0,0);
+  }
+}
+
+function previousQuestion(){
+  if(currentIndex > 0){
+    currentIndex--;
+    renderQuestion();
+  }
+}
+
+function calculateResults(){
+  const sums = {};
+  const counts = {};
+  categories.forEach(c => { sums[c.code] = 0; counts[c.code] = 0; });
+
+  questions.forEach(q => {
+    if(q.type === "interest" && q.scale && answers[q.id] != null){
+      sums[q.scale] += answers[q.id];
+      counts[q.scale]++;
+    }
+  });
+
+  results = categories.map(c => {
+    const average = counts[c.code] ? sums[c.code] / counts[c.code] : 1;
+    return {
+      code:c.code,
+      name:c.name,
+      description:c.description,
+      percent:Math.round((average - 1) / 4 * 100)
+    };
+  }).sort((a,b) => b.percent - a.percent);
+
+  checkConsistency();
+}
+
+function checkConsistency(){
+  // Контрольные вопросы не влияют на score.
+  // Они лишь устанавливают внутренний флаг inconsistency при сильном расхождении.
+  questions.filter(q => q.type === "control").forEach(control => {
+    const paired = questions.find(q =>
+      q.type === "interest" &&
+      q.scale === control.controlScale &&
+      q.id === control.controlScale + "-01"
+    );
+    control.inconsistency = !!(paired && answers[control.id] != null && answers[paired.id] != null &&
+      Math.abs(answers[control.id] - answers[paired.id]) >= 3);
+  });
+}
+
+function renderResults(){
+  const box = document.getElementById("results");
+  box.innerHTML = "";
+  results.slice(0,3).forEach(r => {
+    const item = document.createElement("article");
+    item.className = "result-item";
+    item.innerHTML = `
+      <div class="result-top">
+        <div class="result-name">${r.name}</div>
+        <div class="result-score">${r.percent}%</div>
+      </div>
+      <div class="result-bar"><div style="width:${r.percent}%"></div></div>
+      <p class="result-desc">${r.description}</p>
+    `;
+    box.appendChild(item);
+  });
+}
+
+function restartTest(){
+  for(const key in answers) delete answers[key];
+  currentIndex = 0;
+  results = [];
+  show("startScreen");
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
