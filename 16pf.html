@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Профессиональный стиль — диагностика</title>
+<style>
+:root{
+  --bg:#f7f7f5;--card:#fff;--text:#171717;--muted:#707070;--line:#e7e7e4;
+  --accent:#5b5ce2;--accent-soft:#eeeeff;--success:#2e8b68;--shadow:0 16px 50px rgba(20,20,20,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);background:var(--bg)}
+button{font:inherit}
+.app{min-height:100vh;display:flex;justify-content:center;padding:28px 18px}
+.screen{width:min(900px,100%);margin:auto}
+.hidden{display:none!important}
+.hero{text-align:center;padding:48px 0 36px}
+.badge{display:inline-flex;padding:8px 13px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:14px;font-weight:700;margin-bottom:22px}
+h1{font-size:clamp(34px,6vw,62px);line-height:1.03;letter-spacing:-.045em;margin:0 auto 20px;max-width:760px}
+.subtitle{font-size:clamp(17px,2.5vw,20px);line-height:1.55;color:var(--muted);max-width:720px;margin:0 auto}
+.meta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:30px 0}
+.meta span{background:var(--card);border:1px solid var(--line);padding:11px 15px;border-radius:14px;font-size:14px}
+.primary{border:0;background:var(--text);color:#fff;padding:16px 25px;border-radius:14px;font-weight:750;cursor:pointer;transition:.2s}
+.primary:hover{transform:translateY(-1px);opacity:.92}
+.primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.test-card,.result-card{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:28px}
+.test-top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:13px}
+.progress-label{font-size:14px;color:var(--muted);font-weight:700}
+.progress{height:8px;background:#ececea;border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);border-radius:inherit;transition:width .35s ease}
+.question-wrap{padding:44px 6px 30px;animation:appear .25s ease}
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.question-number{color:var(--accent);font-size:14px;font-weight:800;margin-bottom:13px}
+.question{font-size:clamp(25px,4vw,38px);line-height:1.18;letter-spacing:-.025em;margin:0 0 30px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.answer{position:relative;text-align:left;background:#fff;border:2px solid var(--line);border-radius:18px;padding:22px 20px;min-height:130px;cursor:pointer;transition:.18s}
+.answer:hover{border-color:#c9c9c5;transform:translateY(-2px)}
+.answer.selected{border-color:var(--accent);background:var(--accent-soft)}
+.answer-key{display:inline-flex;width:32px;height:32px;border-radius:10px;align-items:center;justify-content:center;background:#f0f0ee;font-weight:800;margin-bottom:18px}
+.answer.selected .answer-key{background:var(--accent);color:#fff}
+.answer-text{font-size:17px;line-height:1.45;font-weight:650}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:10px}
+.secondary{border:1px solid var(--line);background:#fff;color:var(--text);padding:14px 20px;border-radius:13px;font-weight:700;cursor:pointer}
+.secondary:disabled{opacity:.35;cursor:not-allowed}
+.result-head{text-align:center;padding:15px 0 32px}
+.result-kicker{font-size:14px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.result-title{font-size:clamp(38px,7vw,58px);letter-spacing:-.04em;margin:10px 0 12px}
+.result-desc{font-size:18px;line-height:1.55;color:var(--muted);max-width:650px;margin:auto}
+.section-title{font-size:24px;letter-spacing:-.02em;margin:26px 0 16px}
+.scales{display:grid;gap:14px}
+.scale-row{display:grid;grid-template-columns:150px 1fr 55px;gap:14px;align-items:center}
+.scale-name{font-weight:700}.bar{height:10px;background:#ececea;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:inherit}.scale-value{text-align:right;font-weight:800}
+.directions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.direction{border:1px solid var(--line);border-radius:17px;padding:18px;background:#fff}
+.direction-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px}
+.direction-name{font-weight:800}.direction-score{font-weight:800;color:var(--accent)}
+.direction-bar{height:7px;background:#eee;border-radius:99px;overflow:hidden;margin-bottom:12px}.direction-bar i{display:block;height:100%;background:var(--accent);border-radius:inherit}
+.direction small{color:var(--muted);line-height:1.4}
+.cta{margin-top:28px;padding:25px;border-radius:20px;background:#f0f0ff}
+.cta h3{margin:0 0 8px;font-size:22px}.cta p{margin:0 0 18px;color:var(--muted);line-height:1.5}
+.note{font-size:13px;color:var(--muted);line-height:1.5;margin-top:20px}
+.fade{animation:appear .45s ease}
+@media(max-width:650px){
+  .app{padding:12px}
+  .hero{padding:35px 4px 28px}.test-card,.result-card{padding:19px;border-radius:19px}
+  .answers{grid-template-columns:1fr}.answer{min-height:105px;padding:18px}.answer-key{margin-bottom:12px}
+  .question-wrap{padding:32px 2px 22px}.question{margin-bottom:22px}
+  .scale-row{grid-template-columns:120px 1fr 48px;gap:9px;font-size:14px}
+  .directions{grid-template-columns:1fr}
+  .nav{position:sticky;bottom:0;background:rgba(255,255,255,.94);padding:12px 0 2px}
+  .nav button{flex:1}.secondary{padding:13px 10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <main class="screen">
+
+    <section id="startScreen" class="hero">
+      <div class="badge">Профориентационная диагностика · 12–17 лет</div>
+      <h1>Какой профессиональный стиль тебе подходит?</h1>
+      <p class="subtitle">Небольшая диагностика поможет понять, как тебе комфортнее учиться и работать — с людьми или самостоятельно, по плану или свободно, с понятными задачами или новыми идеями.</p>
+      <div class="meta">
+        <span>32 вопроса</span><span>≈ 5–7 минут</span><span>Нет правильных ответов</span>
+      </div>
+      <button id="startBtn" class="primary">Начать диагностику</button>
+    </section>
+
+    <section id="testScreen" class="test-card hidden">
+      <div class="test-top">
+        <span id="progressLabel" class="progress-label">Вопрос 1 из 32</span>
+        <span id="percentLabel" class="progress-label">3%</span>
+      </div>
+      <div class="progress"><i id="progressBar" style="width:3%"></i></div>
+      <div id="questionWrap" class="question-wrap">
+        <div id="questionNumber" class="question-number"></div>
+        <h2 id="questionText" class="question"></h2>
+        <div id="answers" class="answers"></div>
+      </div>
+      <div class="nav">
+        <button id="backBtn" class="secondary">← Назад</button>
+        <button id="nextBtn" class="primary" disabled>Далее →</button>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="result-card hidden fade">
+      <div class="result-head">
+        <div class="result-kicker">Твой профессиональный стиль</div>
+        <h2 id="profileTitle" class="result-title"></h2>
+        <p id="profileDesc" class="result-desc"></p>
+      </div>
+
+      <h3 class="section-title">Твой профиль</h3>
+      <div id="scales" class="scales"></div>
+
+      <h3 class="section-title">Направления, которые стоит попробовать</h3>
+      <div id="directions" class="directions"></div>
+
+      <div class="cta">
+        <h3>Хочешь разобраться глубже?</h3>
+        <p>Этот результат показывает только общую картину. Более подробный разбор может помочь сопоставить твои интересы, личностный стиль, тип деятельности и профессиональные направления.</p>
+        <button id="detailsBtn" class="primary">Получить подробный разбор</button>
+      </div>
+      <p class="note">Результат не определяет профессию и не является психологическим диагнозом. Это ориентир для дальнейшего исследования себя и разных профессиональных направлений.</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+"use strict";
+
+const questions = [
+{id:1,question:"Тебе дали школьный проект без готового плана.",optionA:"Хочу получить понятный порядок действий",optionB:"Интересно самому придумать, как всё организовать",scale:"Структура",direction:"A ← B"},
+{id:2,question:"На мероприятии ты никого не знаешь.",optionA:"Скорее буду ждать, пока кто-то заговорит со мной",optionB:"Могу сам начать разговор",scale:"Люди",direction:"A ← B"},
+{id:3,question:"Тебе предложили попробовать новое занятие, о котором ты ничего не знаешь.",optionA:"Скорее выберу что-то знакомое",optionB:"Скорее попробую новое",scale:"Новизна",direction:"A ← B"},
+{id:4,question:"В команде никто не может решить, что делать дальше.",optionA:"Подожду общего решения",optionB:"Предложу свой вариант и попробую организовать остальных",scale:"Влияние",direction:"A ← B"},
+{id:5,question:"Представь, что нужно придумать устройство будущего.",optionA:"Буду думать, как сделать что-то реально существующее",optionB:"Буду придумывать необычные возможности, даже если их пока не существует",scale:"Идеи",direction:"A ← B"},
+{id:6,question:"У тебя свободный день перед важным проектом.",optionA:"Предпочту спокойно заниматься одним делом",optionB:"Хочется нескольких разных занятий и событий",scale:"Динамика",direction:"A ← B"},
+{id:7,question:"В групповой работе возникает спор.",optionA:"Для меня главное — найти наиболее логичное решение",optionB:"Мне важно понять, что чувствуют участники и почему они спорят",scale:"Чувствительность",direction:"A ← B"},
+{id:8,question:"Учитель разрешил выбрать, как выполнять большую работу.",optionA:"Предпочту работать вместе с кем-нибудь",optionB:"Предпочту самому определить способ и работать самостоятельно",scale:"Самостоятельность",direction:"A ← B"},
+{id:9,question:"Тебе дали задачу с большим количеством правил.",optionA:"Правила помогают мне понять, что делать",optionB:"Слишком много правил скорее мешают",scale:"Структура",direction:"B ← A"},
+{id:10,question:"На встрече нужно высказать своё мнение перед группой.",optionA:"Лучше промолчу, если меня прямо не спросили",optionB:"Скорее выскажу свою позицию",scale:"Люди",direction:"A ← B"},
+{id:11,question:"В привычном школьном проекте предлагают полностью изменить подход.",optionA:"Лучше оставить то, что уже работает",optionB:"Интересно посмотреть, что получится по-новому",scale:"Новизна",direction:"A ← B"},
+{id:12,question:"Ты уверен, что команда выбрала не лучший вариант.",optionA:"Скорее соглашусь с большинством",optionB:"Буду отстаивать другой вариант",scale:"Влияние",direction:"A ← B"},
+{id:13,question:"Тебе нужно объяснить сложную тему.",optionA:"Буду приводить конкретные примеры",optionB:"Попробую объяснить общую идею и связи между вещами",scale:"Идеи",direction:"A ← B"},
+{id:14,question:"Какой учебный день кажется тебе более привлекательным?",optionA:"Несколько спокойных занятий без спешки",optionB:"Много разных дел, которые быстро сменяют друг друга",scale:"Динамика",direction:"A ← B"},
+{id:15,question:"Друг рассказывает тебе о проблеме.",optionA:"Сначала думаю, как решить проблему",optionB:"Сначала стараюсь понять, что он чувствует",scale:"Чувствительность",direction:"A ← B"},
+{id:16,question:"Тебе поручили сложную задачу.",optionA:"Хочется периодически сверяться с другими",optionB:"Предпочитаю самому разобраться и показать результат",scale:"Самостоятельность",direction:"A ← B"},
+{id:17,question:"Представь идеальное рабочее место.",optionA:"Понятные процессы, правила и порядок",optionB:"Можно самому решать, как организовать работу",scale:"Структура",direction:"A ← B"},
+{id:18,question:"После уроков нужно выбрать, чем заняться.",optionA:"Встретиться с друзьями или заняться чем-то вместе",optionB:"Заняться своим делом в одиночку",scale:"Люди",direction:"A ← B"},
+{id:19,question:"Тебе предлагают участвовать в конкурсе, где заранее неизвестен результат.",optionA:"Скорее выберу более предсказуемый вариант",optionB:"Неопределённость делает это интереснее",scale:"Новизна",direction:"A ← B"},
+{id:20,question:"В команде появился новый проект, и нужен человек, который будет координировать работу.",optionA:"Предпочту заниматься своей частью",optionB:"Мне было бы интересно координировать остальных",scale:"Влияние",direction:"A ← B"},
+{id:21,question:"Что тебе интереснее?",optionA:"Разобраться, как работает конкретный механизм",optionB:"Придумать новую концепцию или способ его применения",scale:"Идеи",direction:"A ← B"},
+{id:22,question:"Какой формат проекта тебе ближе?",optionA:"Долгая спокойная работа с возможностью не торопиться",optionB:"Короткие этапы, активное движение и быстрые результаты",scale:"Динамика",direction:"A ← B"},
+{id:23,question:"Ты создаёшь приложение для школьников.",optionA:"В первую очередь думаю о функциях и удобстве",optionB:"В первую очередь думаю о том, что пользователь будет чувствовать",scale:"Чувствительность",direction:"A ← B"},
+{id:24,question:"Если ты не понимаешь задачу...",optionA:"Скорее спрошу кого-нибудь и разберусь вместе",optionB:"Сначала попробую разобраться самостоятельно",scale:"Самостоятельность",direction:"A ← B"},
+{id:25,question:"В проекте внезапно поменялись требования.",optionA:"Это скорее раздражает — хочется определённости",optionB:"Это нормально, можно перестроиться",scale:"Новизна",direction:"A ← B"},
+{id:26,question:"Тебе нужно убедить команду попробовать твою идею.",optionA:"Лучше, чтобы решение приняли другие",optionB:"Готов объяснять, спорить и отстаивать свою идею",scale:"Влияние",direction:"A ← B"},
+{id:27,question:"Представь, что тебе нужно создать компьютерную игру.",optionA:"Интересно продумать правила и конкретные механики",optionB:"Интересно придумать необычный мир и концепцию",scale:"Идеи",direction:"A ← B"},
+{id:28,question:"Тебе нужно выполнить большую задачу.",optionA:"Разбить её на этапы и идти по плану",optionB:"Начать с того, что сейчас кажется наиболее интересным",scale:"Структура",direction:"A ← B"},
+{id:29,question:"В новом кружке или компании...",optionA:"Мне требуется время, чтобы освоиться",optionB:"Обычно довольно быстро включаюсь в общение",scale:"Люди",direction:"A ← B"},
+{id:30,question:"После нескольких часов работы тебе предлагают ещё одно интересное дело.",optionA:"Скорее хочу закончить текущее и отдохнуть",optionB:"Скорее хочется переключиться и продолжить активность",scale:"Динамика",direction:"A ← B"},
+{id:31,question:"Если ты работаешь над проектом для людей...",optionA:"Главное — чтобы результат хорошо выполнял задачу",optionB:"Важно, чтобы люди почувствовали себя комфортно и получили хороший опыт",scale:"Чувствительность",direction:"A ← B"},
+{id:32,question:"Если тебе дали индивидуальное задание...",optionA:"Мне удобнее иметь возможность обсудить его с кем-то",optionB:"Мне нравится самому отвечать за весь результат",scale:"Самостоятельность",direction:"A ← B"}
+];
+
+const scales = ["Люди","Влияние","Самостоятельность","Структура","Новизна","Идеи","Динамика","Чувствительность"];
+
+const profiles = {
+  "Исследователь":{
+    desc:"Тебе может быть интересно разбираться в сложных вещах, искать новые решения и самостоятельно докапываться до сути. Тебе может быть комфортнее там, где есть пространство для экспериментов и собственных идей.",
+    rule:s=> s.Идеи>=60 && s.Новизна>=60 && s.Самостоятельность>=60
+  },
+  "Инициатор":{
+    desc:"Тебе может быть интересно запускать новое, действовать активно и влиять на то, как развивается дело. Стоит попробовать задачи, где есть движение, неопределённость и возможность проявить инициативу.",
+    rule:s=> s.Влияние>=60 && s.Новизна>=60 && s.Динамика>=60
+  },
+  "Коммуникатор":{
+    desc:"Тебе может быть комфортно много взаимодействовать с людьми, обсуждать идеи и двигать совместные дела вперёд. Могут подойти проекты, где важны общение, энергия и заметный результат.",
+    rule:s=> s.Люди>=60 && s.Влияние>=60 && s.Динамика>=60
+  },
+  "Создатель":{
+    desc:"Тебе может быть интересно придумывать необычные решения и превращать идеи в новые форматы. Может подойти среда, где есть свобода эксперимента и не требуется всё делать строго по шаблону.",
+    rule:s=> s.Идеи>=60 && s.Новизна>=60 && s.Структура<=45
+  },
+  "Систематизатор":{
+    desc:"Тебе может быть комфортно наводить порядок, разбираться в сложных задачах и самостоятельно доводить работу до результата. Стоит попробовать занятия, где важны логика, последовательность и понятные критерии.",
+    rule:s=> s.Структура>=60 && s.Самостоятельность>=60 && s.Новизна<=45
+  },
+  "Помогающий":{
+    desc:"Тебе может быть интересно понимать людей, учитывать их состояние и помогать находить решения. Могут подойти проекты, где результат зависит не только от задачи, но и от качества взаимодействия.",
+    rule:s=> s.Люди>=60 && s.Чувствительность>=60 && s.Влияние>=50
+  }
+};
+
+const directionWeights = {
+  "IT и технологии":{Идеи:25,Самостоятельность:20,Новизна:20,Структура:15,Люди:10,Динамика:10},
+  "Дизайн и креатив":{Идеи:30,Новизна:25,Чувствительность:20,Самостоятельность:15,Люди:10},
+  "Бизнес и предпринимательство":{Влияние:25,Новизна:25,Динамика:20,Самостоятельность:15,Идеи:15},
+  "Управление и проекты":{Влияние:25,Структура:20,Люди:20,Динамика:20,Самостоятельность:15},
+  "Маркетинг и медиа":{Люди:25,Идеи:25,Динамика:20,Новизна:20,Влияние:10},
+  "Наука и исследования":{Идеи:25,Самостоятельность:25,Структура:25,Новизна:15,Чувствительность:10},
+  "Образование":{Люди:30,Чувствительность:25,Структура:15,Влияние:15,Идеи:15},
+  "Помогающие профессии":{Люди:35,Чувствительность:35,Влияние:15,Структура:10,Самостоятельность:5},
+  "Инженерия":{Структура:30,Самостоятельность:20,Идеи:20,Новизна:15,Динамика:10,Люди:5},
+  "Аналитика и финансы":{Структура:30,Самостоятельность:25,Идеи:20,Новизна:10,Влияние:10,Люди:5}
+};
+
+let current = 0;
+let answers = Array(questions.length).fill(null);
+
+const $ = id => document.getElementById(id);
+const startScreen=$("startScreen"), testScreen=$("testScreen"), resultScreen=$("resultScreen");
+
+function renderQuestion(){
+  const q=questions[current];
+  $("progressLabel").textContent=`Вопрос ${current+1} из ${questions.length}`;
+  const pct=Math.round(((current+1)/questions.length)*100);
+  $("percentLabel").textContent=`${pct}%`;
+  $("progressBar").style.width=`${pct}%`;
+  $("questionNumber").textContent=`ВОПРОС ${String(current+1).padStart(2,"0")}`;
+  $("questionText").textContent=q.question;
+  $("answers").innerHTML="";
+  [["A",q.optionA],["B",q.optionB]].forEach(([key,text])=>{
+    const btn=document.createElement("button");
+    btn.className="answer"+(answers[current]===key?" selected":"");
+    btn.type="button";
+    btn.innerHTML=`<span class="answer-key">${key}</span><div class="answer-text">${text}</div>`;
+    btn.addEventListener("click",()=>selectAnswer(key));
+    $("answers").appendChild(btn);
+  });
+  $("backBtn").disabled=current===0;
+  $("nextBtn").disabled=answers[current]===null;
+  $("nextBtn").textContent=current===questions.length-1?"Показать результат →":"Далее →";
+}
+
+function selectAnswer(key){
+  answers[current]=key;
+  [...$("answers").children].forEach(b=>b.classList.remove("selected"));
+  const index=key==="A"?0:1;
+  $("answers").children[index].classList.add("selected");
+  $("nextBtn").disabled=false;
+}
+
+function calculateScales(){
+  const totals={};
+  scales.forEach(s=>totals[s]={a:0,b:0});
+  questions.forEach((q,i)=>{
+    const answer=answers[i];
+    if(!answer) return;
+    const reversed=q.id===9;
+    if((answer==="B" && !reversed)||(answer==="A" && reversed)) totals[q.scale].b++;
+    else totals[q.scale].a++;
+  });
+  const result={};
+  scales.forEach(s=>{
+    const t=totals[s], n=t.a+t.b;
+    result[s]=n?Math.round((t.b/n)*100):0;
+  });
+  return result;
+}
+
+function profileScore(name,s){
+  switch(name){
+    case "Исследователь": return (s.Идеи+s.Новизна+s.Самостоятельность)/3;
+    case "Инициатор": return (s.Влияние+s.Новизна+s.Динамика)/3;
+    case "Коммуникатор": return (s.Люди+s.Влияние+s.Динамика)/3;
+    case "Создатель": return (s.Идеи+s.Новизна+(100-s.Структура))/3;
+    case "Систематизатор": return (s.Структура+s.Самостоятельность+(100-s.Новизна))/3;
+    case "Помогающий": return (s.Люди+s.Чувствительность+s.Влияние)/3;
+    default: return 0;
+  }
+}
+
+function getProfile(s){
+  const eligible=Object.keys(profiles).filter(name=>profiles[name].rule(s));
+  const pool=eligible.length?eligible:Object.keys(profiles);
+  return pool.reduce((best,name)=>profileScore(name,s)>profileScore(best,s)?name:best,pool[0]);
+}
+
+function directionScore(weights,s){
+  let total=0,weight=0;
+  Object.entries(weights).forEach(([scale,w])=>{
+    total+=(Number(s[scale])||0)*w;
+    weight+=w;
+  });
+  return weight?Math.round(total/weight):0;
+}
+
+function renderResult(){
+  const s=calculateScales();
+  const profile=getProfile(s);
+  $("profileTitle").textContent=profile;
+  $("profileDesc").textContent=profiles[profile].desc;
+
+  $("scales").innerHTML=scales.map(name=>`
+    <div class="scale-row">
+      <div class="scale-name">${name}</div>
+      <div class="bar"><i style="width:${s[name]}%"></i></div>
+      <div class="scale-value">${s[name]}%</div>
+    </div>`).join("");
+
+  const dirs=Object.entries(directionWeights)
+    .map(([name,weights])=>({name,score:directionScore(weights,s)}))
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,5);
+
+  $("directions").innerHTML=dirs.map(d=>`
+    <div class="direction">
+      <div class="direction-top"><span class="direction-name">${d.name}</span><span class="direction-score">${d.score}%</span></div>
+      <div class="direction-bar"><i style="width:${d.score}%"></i></div>
+      <small>Может быть интересно исследовать это направление с учётом твоего общего профиля.</small>
+    </div>`).join("");
+}
+
+$("startBtn").addEventListener("click",()=>{
+  current=0;
+  answers=Array(questions.length).fill(null);
+  startScreen.classList.add("hidden");
+  resultScreen.classList.add("hidden");
+  testScreen.classList.remove("hidden");
+  renderQuestion();
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+$("backBtn").addEventListener("click",()=>{
+  if(current>0){current--;renderQuestion();window.scrollTo({top:0,behavior:"smooth"});}
+});
+
+$("nextBtn").addEventListener("click",()=>{
+  if(answers[current]===null)return;
+  if(current<questions.length-1){current++;renderQuestion();window.scrollTo({top:0,behavior:"smooth"});}
+  else{
+    renderResult();
+    testScreen.classList.add("hidden");
+    resultScreen.classList.remove("hidden");
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+});
+
+$("detailsBtn").addEventListener("click",()=>{
+  alert("Подробный разбор скоро будет доступен");
+});
+</script>
+</body>
+</html>

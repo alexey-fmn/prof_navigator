@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Выбери тест</title>
+
+    <style>
+        /* ===== Основные настройки ===== */
+        :root {
+            --background: #f7f7f5;
+            --text: #202020;
+            --button-bg: #ffffff;
+            --button-border: #deded9;
+            --button-hover-bg: #f1f1ed;
+            --button-hover-border: #cfcfca;
+
+            --content-width: 520px;
+            --button-height: 64px;
+            --button-radius: 14px;
+        }
+
+        /* ===== Базовые стили ===== */
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: var(--background);
+            color: var(--text);
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+        }
+
+        /* ===== Основной контейнер ===== */
+        .test-selection {
+            width: 100%;
+            max-width: var(--content-width);
+            padding: 32px 20px;
+            text-align: center;
+        }
+
+        /* ===== Заголовок ===== */
+        h1 {
+            margin: 0 0 40px;
+
+            font-size: 42px;
+            line-height: 1.15;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+
+        /* ===== Кнопки ===== */
+        .test-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .test-button {
+            width: 100%;
+            height: var(--button-height);
+
+            padding: 0 24px;
+
+            border: 1px solid var(--button-border);
+            border-radius: var(--button-radius);
+
+            background: var(--button-bg);
+            color: var(--text);
+
+            font: inherit;
+            font-size: 18px;
+            font-weight: 500;
+
+            cursor: pointer;
+
+            transition:
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.15s ease;
+        }
+
+        .test-button:hover {
+            background: var(--button-hover-bg);
+            border-color: var(--button-hover-border);
+        }
+
+        .test-button:active {
+            transform: scale(0.985);
+        }
+
+        .test-button:focus-visible {
+            outline: 3px solid rgba(32, 32, 32, 0.15);
+            outline-offset: 3px;
+        }
+
+        /* ===== Мобильные устройства ===== */
+        @media (max-width: 600px) {
+            .test-selection {
+                padding: 24px 20px;
+            }
+
+            h1 {
+                margin-bottom: 32px;
+                font-size: 34px;
+            }
+
+            .test-buttons {
+                gap: 12px;
+            }
+
+            .test-button {
+                height: 60px;
+                font-size: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="test-selection">
+
+        <!-- Заголовок страницы -->
+        <h1>Выбери тест</h1>
+
+        <!-- Кнопки выбора теста -->
+        <div class="test-buttons">
+
+            <!-- Карта интересов -->
+            <button
+                class="test-button"
+                onclick="window.location.href = 'golomstok.html';">
+                Карта интересов
+            </button>
+
+            <!-- 16PF Кеттелла -->
+            <button
+                class="test-button"
+                onclick="window.location.href = '16pf.html';">
+                16PF Кеттелла
+            </button>
+
+            <!-- Профессиональные типы -->
+            <button
+                class="test-button"
+                onclick="window.location.href = 'holland.html';">
+                Профессиональные типы
+            </button>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
