@@ -138,7 +138,7 @@ async function saveResultToServer() {
   try {
     const completedAt = new Date().toISOString();
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(`${API_URL}/results`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
