@@ -765,6 +765,7 @@
 
   <script>
     "use strict";
+    const API_URL ="https://d5doh57gnofrijterto1.7qsg961h.apigw.yandexcloud.net";
 
     /*
      * RIASEC TEST
@@ -1418,10 +1419,43 @@
       ];
     }
 
+    async function saveResult(scores, sortedTypes) {
+  const code = sortedTypes.slice(0, 3).join("");
+
+  const result = {
+    test: "holland",
+    code: code,
+    scores: scores,
+    answers: answers,
+    completedAt: new Date().toISOString()
+  };
+
+  try {
+    const response = await fetch(`${API_URL}/results`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(result)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    console.log("Результат сохранён:", result);
+
+  } catch (error) {
+    console.error("Ошибка сохранения результата:", error);
+  }
+}
+
     function renderResult() {
       const scores = calculateScores();
       const sortedTypes = sortTypes(scores);
       const code = sortedTypes.slice(0, 3).join("");
+
+      saveResult(scores, sortedTypes);
 
       document.getElementById("hollandCode").textContent = code;
 
