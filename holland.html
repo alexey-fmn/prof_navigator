@@ -1187,12 +1187,13 @@
     }
 
     function initializeTest() {
+        startedAt = new Date().toISOString();
       shuffledQuestions = shuffle(questions);
       currentQuestionIndex = 0;
       answers = {};
       selectedAnswer = null;
 
-      startedAt = new Date().toISOString();
+      
 
       renderQuestion();
       showScreen(testScreen);
