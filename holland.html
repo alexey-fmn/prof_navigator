@@ -1137,6 +1137,7 @@
     let currentQuestionIndex = 0;
     let answers = {};
     let selectedAnswer = null;
+    let startedAt = null;
 
     const startScreen = document.getElementById("startScreen");
     const instructionScreen = document.getElementById("instructionScreen");
@@ -1190,6 +1191,8 @@
       currentQuestionIndex = 0;
       answers = {};
       selectedAnswer = null;
+
+      startedAt = new Date().toISOString();
 
       renderQuestion();
       showScreen(testScreen);
@@ -1422,12 +1425,18 @@
     async function saveResult(scores, sortedTypes) {
   const code = sortedTypes.slice(0, 3).join("");
 
+  const completedAt = new Date().toISOString();
+
   const result = {
     test: "holland",
+    testVersion: "1.0",
+
+    startedAt: startedAt,
+    completedAt: completedAt,
+
     code: code,
     scores: scores,
-    answers: answers,
-    completedAt: new Date().toISOString()
+    answers: answers
   };
 
   try {
@@ -1443,9 +1452,16 @@
       throw new Error(`HTTP ${response.status}`);
     }
 
-    console.log("Результат сохранён:", result);
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.error || "Неизвестная ошибка API");
+    }
+
+    console.log("Результат сохранён:", data);
 
   } catch (error) {
+    // Ошибка сохранения не мешает пользователю увидеть результат
     console.error("Ошибка сохранения результата:", error);
   }
 }
