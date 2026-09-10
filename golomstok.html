@@ -135,38 +135,6 @@ function startTest(){
   renderQuestion();
 }
 
-async function saveResultToServer() {
-  try {
-    const completedAt = new Date().toISOString();
-
-    const response = await fetch(`${API_URL}/results`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        test_type: "golomstock",
-        started_at: testStartedAt,
-        completed_at: completedAt,
-        result: {
-          scores: Object.fromEntries(
-            results.map(r => [r.code, r.percent])
-          ),
-          top: results.slice(0, 3)
-        },
-        answers: answers
-      })
-    });
-
-    const data = await response.json();
-
-    console.log("Результат Голомштока сохранён:", data);
-
-  } catch (error) {
-    console.error("Ошибка сохранения результата Голомштока:", error);
-  }
-}
-
 function renderQuestion(){
   const q = questions[currentIndex];
   const total = questions.length;
@@ -209,7 +177,17 @@ function nextQuestion(){
     show("resultScreen");
     window.scrollTo(0,0);
 
-    saveTestResult();
+    saveTestResult({
+  testType: "golomstock",
+  startedAt: testStartedAt,
+  result: {
+    scores: Object.fromEntries(
+      results.map(r => [r.code, r.percent])
+    ),
+    top: results.slice(0, 3)
+  },
+  answers: answers
+});
   }
 }
 
