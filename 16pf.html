@@ -57,7 +57,9 @@ h1{margin:0;font-size:clamp(32px,5vw,48px);line-height:1.08;letter-spacing:-1.5p
 </section>
 </main></div>
 
-<script src="js/save-result.js">
+<script src="js/save-result.js"></script>
+
+<script>
 "use strict";
 
 const questions=[
@@ -167,20 +169,7 @@ function renderResult(){
  $("directions").innerHTML=directions.map(d=>`<div class="direction"><div class="direction-top"><span class="direction-name">${d.name}</span><span class="direction-score">${d.score}%</span></div><div class="direction-bar"><i style="width:${d.score}%"></i></div><small>Может быть интересно исследовать это направление с учётом твоего общего профиля.</small></div>`).join("");
  return{scores:s,profile,directions};
 }
-async function saveResultToServer(resultData){
- const status=$("saveStatus");status.textContent="Сохраняем результат…";
- try{
-  const completedAt=new Date().toISOString(),payload={
-   test_type:"16pf",started_at:startedAt,completed_at:completedAt,
-   result:{scores: resultData.scores,scales:resultData.scales,profile:resultData.profile,directions:resultData.directions},
-   answers:answers
-  };
-  const response=await fetch(`${API_URL}/results`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-  if(!response.ok)throw new Error(`HTTP ${response.status}`);
-  const data=await response.json();if(data.success===false)throw new Error(data.error||"Ошибка API");
-  console.log("Результат 16PF сохранён:",data);status.textContent="Результат сохранён.";
- }catch(error){console.error("Ошибка сохранения результата 16PF:",error);status.textContent="Результат показан на экране. Не удалось сохранить его на сервере."}
-}
+
 
 await saveTestResult({
   testType: "16pf",

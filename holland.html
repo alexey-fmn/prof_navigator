@@ -763,7 +763,9 @@
     </div>
   </main>
 
-  <script src="js/save-result.js">
+  <script src="js/save-result.js"></script>
+
+<script>
     "use strict";
 
     /*
@@ -1421,50 +1423,6 @@
         "Междисциплинарные проекты, объединяющие несколько интересов"
       ];
     }
-
-    async function saveResult(scores, sortedTypes) {
-  const code = sortedTypes.slice(0, 3).join("");
-
-  const completedAt = new Date().toISOString();
-
-  const result = {
-    test: "holland",
-    testVersion: "1.0",
-
-    startedAt: startedAt,
-    completedAt: completedAt,
-
-    code: code,
-    scores: scores,
-    answers: answers
-  };
-
-  try {
-    const response = await fetch(`${API_URL}/results`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(result)
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (!data.success) {
-      throw new Error(data.error || "Неизвестная ошибка API");
-    }
-
-    console.log("Результат сохранён:", data);
-
-  } catch (error) {
-    // Ошибка сохранения не мешает пользователю увидеть результат
-    console.error("Ошибка сохранения результата:", error);
-  }
-}
 
 await saveTestResult({
   testType: "holland",
