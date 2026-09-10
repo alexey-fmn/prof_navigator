@@ -763,9 +763,8 @@
     </div>
   </main>
 
-  <script>
+  <script src="js/save-result.js">
     "use strict";
-    const API_URL ="https://d5doh57gnofrijterto1.7qsg961h.apigw.yandexcloud.net";
 
     /*
      * RIASEC TEST
@@ -1467,12 +1466,22 @@
   }
 }
 
+await saveTestResult({
+  testType: "holland",
+  startedAt: startedAt,
+  result: {
+    scores: scores,
+    code: sortedTypes.slice(0, 3).join("")
+  },
+  answers: answers
+});
+
     function renderResult() {
       const scores = calculateScores();
       const sortedTypes = sortTypes(scores);
       const code = sortedTypes.slice(0, 3).join("");
 
-      saveResult(scores, sortedTypes);
+      saveTestResult(scores, sortedTypes);
 
       document.getElementById("hollandCode").textContent = code;
 
