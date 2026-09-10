@@ -170,30 +170,59 @@ function renderResult(){
  return{scores:s,profile,directions};
 }
 
-
-await saveTestResult({
-  testType: "16pf",
-  startedAt: startedAt,
-  result: {
-    scores: resultData.scores,
-    profile: resultData.profile,
-    directions: resultData.directions
-  },
-  answers: answers
-});
-
 $("startBtn").addEventListener("click",()=>{
- current=0;answers=Array(questions.length).fill(null);startedAt=new Date().toISOString();$("saveStatus").textContent="";
- startScreen.classList.add("hidden");resultScreen.classList.add("hidden");testScreen.classList.remove("hidden");renderQuestion();window.scrollTo({top:0,behavior:"smooth"});
+  current=0;
+  answers=Array(questions.length).fill(null);
+  startedAt=new Date().toISOString();
+  $("saveStatus").textContent="";
+
+  startScreen.classList.add("hidden");
+  resultScreen.classList.add("hidden");
+  testScreen.classList.remove("hidden");
+
+  renderQuestion();
+  window.scrollTo({top:0,behavior:"smooth"});
 });
-$("backBtn").addEventListener("click",()=>{if(current>0){current--;renderQuestion();window.scrollTo({top:0,behavior:"smooth"})}});
+
+$("backBtn").addEventListener("click",()=>{
+  if(current>0){
+    current--;
+    renderQuestion();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+});
+
 $("nextBtn").addEventListener("click",()=>{
- if(answers[current]===null)return;
- if(current<questions.length-1){current++;renderQuestion();window.scrollTo({top:0,behavior:"smooth"})}
- else{
-  const resultData=renderResult();testScreen.classList.add("hidden");resultScreen.classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});saveTestResult(resultData)}
+  if(answers[current]===null)return;
+
+  if(current<questions.length-1){
+    current++;
+    renderQuestion();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    const resultData=renderResult();
+
+    testScreen.classList.add("hidden");
+    resultScreen.classList.remove("hidden");
+
+    window.scrollTo({top:0,behavior:"smooth"});
+
+    saveTestResult({
+      testType:"16pf",
+      startedAt:startedAt,
+      result:{
+        scores:resultData.scores,
+        profile:resultData.profile,
+        directions:resultData.directions
+      },
+      answers:answers
+    });
+  }
 });
-$("detailsBtn").addEventListener("click",()=>alert("Подробный разбор скоро будет доступен"));
+
+$("detailsBtn").addEventListener("click",()=>{
+  alert("Подробный разбор скоро будет доступен");
+});
 </script>
 </body>
 </html>
