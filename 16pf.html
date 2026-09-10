@@ -167,14 +167,14 @@ function renderResult(){
  $("profileTitle").textContent=profile;$("profileDesc").textContent=profiles[profile].desc;
  $("scales").innerHTML=scales.map(name=>`<div class="scale-row"><div class="scale-name">${name}</div><div class="bar"><i style="width:${s[name]}%"></i></div><div class="scale-value">${s[name]}%</div></div>`).join("");
  $("directions").innerHTML=directions.map(d=>`<div class="direction"><div class="direction-top"><span class="direction-name">${d.name}</span><span class="direction-score">${d.score}%</span></div><div class="direction-bar"><i style="width:${d.score}%"></i></div><small>Может быть интересно исследовать это направление с учётом твоего общего профиля.</small></div>`).join("");
- return{scales:s,profile,directions};
+ return{scores:s,profile,directions};
 }
 async function saveResultToServer(resultData){
  const status=$("saveStatus");status.textContent="Сохраняем результат…";
  try{
   const completedAt=new Date().toISOString(),payload={
    test_type:"16pf",started_at:startedAt,completed_at:completedAt,
-   result:{scales:resultData.scales,profile:resultData.profile,directions:resultData.directions},
+   result:{scores: resultData.scores,scales:resultData.scales,profile:resultData.profile,directions:resultData.directions},
    answers:answers
   };
   const response=await fetch(`${API_URL}/results`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -192,7 +192,8 @@ $("backBtn").addEventListener("click",()=>{if(current>0){current--;renderQuestio
 $("nextBtn").addEventListener("click",()=>{
  if(answers[current]===null)return;
  if(current<questions.length-1){current++;renderQuestion();window.scrollTo({top:0,behavior:"smooth"})}
- else{const resultData=renderResult();testScreen.classList.add("hidden");resultScreen.classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});saveResultToServer(resultData)}
+ else{
+  const resultData=renderResult();testScreen.classList.add("hidden");resultScreen.classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});saveResultToServer(resultData)}
 });
 $("detailsBtn").addEventListener("click",()=>alert("Подробный разбор скоро будет доступен"));
 </script>
