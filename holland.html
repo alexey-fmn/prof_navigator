@@ -764,8 +764,6 @@
   </main>
 
   <script src="js/save-result.js"></script>
-
-<script src="js/save-result.js"></script>
   <script>
     "use strict";
 
@@ -1425,110 +1423,22 @@
       ];
     }
 
-await saveTestResult({
-  testType: "holland",
-  startedAt: startedAt,
-  result: {
-    scores: scores,
-    code: sortedTypes.slice(0, 3).join("")
-  },
-  answers: answers
-});
-
     function renderResult() {
-      const scores = calculateScores();
-      const sortedTypes = sortTypes(scores);
-      const code = sortedTypes.slice(0, 3).join("");
+  const scores = calculateScores();
+  const sortedTypes = sortTypes(scores);
+  const code = sortedTypes.slice(0, 3).join("");
 
-      saveTestResult(scores, sortedTypes);
+  saveTestResult({
+    testType: "holland",
+    startedAt: startedAt,
+    result: {
+      scores: scores,
+      code: code
+    },
+    answers: answers
+  });
 
-      document.getElementById("hollandCode").textContent = code;
-
-      document.getElementById("resultSummary").textContent =
-        getResultSummary(sortedTypes, scores);
-
-      const topTypesContainer =
-        document.getElementById("topTypes");
-
-      topTypesContainer.innerHTML = "";
-
-      sortedTypes.slice(0, 3).forEach((type) => {
-        const data = typeData[type];
-
-        const card = document.createElement("div");
-        card.className = "top-type";
-
-        card.innerHTML = `
-          <div class="top-type-header">
-            <div class="type-title">${data.name}</div>
-            <div class="type-score">${scores[type]}%</div>
-          </div>
-          <p class="type-description">${data.description}</p>
-        `;
-
-        topTypesContainer.appendChild(card);
-      });
-
-      const allScoresContainer =
-        document.getElementById("allScores");
-
-      allScoresContainer.innerHTML = "";
-
-      sortedTypes.forEach((type) => {
-        const data = typeData[type];
-
-        const row = document.createElement("div");
-        row.className = "score-row";
-
-        row.innerHTML = `
-          <div class="score-name">${data.name}</div>
-
-          <div class="score-track">
-            <div
-              class="score-fill"
-              data-score="${scores[type]}"
-            ></div>
-          </div>
-
-          <div class="score-value">${scores[type]}%</div>
-        `;
-
-        allScoresContainer.appendChild(row);
-      });
-
-      const meaningContainer =
-        document.getElementById("meaningText");
-
-      meaningContainer.innerHTML = "";
-
-      getMeaning(sortedTypes, scores).forEach((text) => {
-        const paragraph = document.createElement("p");
-        paragraph.textContent = text;
-        meaningContainer.appendChild(paragraph);
-      });
-
-      const directionsContainer =
-        document.getElementById("directionsList");
-
-      directionsContainer.innerHTML = "";
-
-      getDirections(sortedTypes).forEach((direction) => {
-        const item = document.createElement("li");
-        item.textContent = direction;
-        directionsContainer.appendChild(item);
-      });
-
-      showScreen(resultScreen);
-
-      requestAnimationFrame(() => {
-        document
-          .querySelectorAll(".score-fill")
-          .forEach((fill) => {
-            fill.style.width =
-              `${fill.dataset.score}%`;
-          });
-      });
-    }
+  document.getElementById("hollandCode").textContent = code;}
 
     function calculateResult() {
       /*
