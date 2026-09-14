@@ -1423,22 +1423,121 @@
       ];
     }
 
-    function renderResult() {
+  function renderResult() {
   const scores = calculateScores();
   const sortedTypes = sortTypes(scores);
   const code = sortedTypes.slice(0, 3).join("");
 
-  saveTestResult({
-    testType: "holland",
-    startedAt: startedAt,
-    result: {
-      scores: scores,
-      code: code
-    },
-    answers: answers
+  // Holland Code
+  document.getElementById("hollandCode").textContent = code;
+
+  // Краткое описание результата
+  document.getElementById("resultSummary").textContent =
+    getResultSummary(sortedTypes, scores);
+
+  // ТОП-3 типа
+  const topTypesContainer = document.getElementById("topTypes");
+  topTypesContainer.innerHTML = "";
+
+  sortedTypes.slice(0, 3).forEach((type) => {
+    const item = document.createElement("div");
+    item.className = "top-type";
+
+    item.innerHTML = `
+      <div class="top-type-header">
+        <div class="type-title">
+          ${typeData[type].name}
+        </div>
+
+        <div class="type-score">
+          ${scores[type]}%
+        </div>
+      </div>
+
+      <p class="type-description">
+        ${typeData[type].description}
+      </p>
+    `;
+
+    topTypesContainer.appendChild(item);
   });
 
-  document.getElementById("hollandCode").textContent = code;}
+  // Все 6 типов
+  const allScoresContainer = document.getElementById("allScores");
+  allScoresContainer.innerHTML = "";
+
+  sortedTypes.forEach((type) => {
+    const row = document.createElement("div");
+    row.className = "score-row";
+
+    row.innerHTML = `
+      <div class="score-name">
+        ${typeData[type].name}
+      </div>
+
+      <div class="score-track">
+        <div
+          class="score-fill"
+          style="width: ${scores[type]}%"
+        ></div>
+      </div>
+
+      <div class="score-value">
+        ${scores[type]}%
+      </div>
+    `;
+
+    allScoresContainer.appendChild(row);
+  });
+
+  // Что означает результат
+  const meaningContainer = document.getElementById("meaningText");
+  meaningContainer.innerHTML = "";
+
+  const meaning = getMeaning(sortedTypes, scores);
+
+  meaning.forEach((text) => {
+    const p = document.createElement("p");
+    p.textContent = text;
+    meaningContainer.appendChild(p);
+  });
+
+  // Направления
+  const directionsContainer =
+    document.getElementById("directionsList");
+
+  directionsContainer.innerHTML = "";
+
+  const directions = getDirections(sortedTypes);
+
+  directions.forEach((direction) => {
+    const li = document.createElement("li");
+    li.textContent = direction;
+    directionsContainer.appendChild(li);
+  });
+
+  // Самое важное — показать экран результата
+  showScreen(resultScreen);
+
+  // Сохраняем результат
+  if (typeof saveTestResult === "function") {
+    saveTestResult({
+      testType: "holland",
+      startedAt: startedAt,
+      result: {
+        scores: scores,
+        code: code,
+        top: sortedTypes.slice(0, 3).map((type) => ({
+          code: type,
+          name: typeData[type].name,
+          percent: scores[type]
+        }))
+      },
+      answers: answers
+    });
+  }
+}
+
 
     function calculateResult() {
       /*
