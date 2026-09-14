@@ -848,9 +848,64 @@ h1 {
 
 .screen .answer {
   min-height: 58px;
+  grid-template-columns: 1fr;
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+/* Golomstock answers — как Holland */
+.screen .answers {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 11px;
+}
+
+.screen .answer {
+  width: 100%;
+  min-height: auto;
+  padding: 17px 18px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+
+  background: #fff;
+  color: var(--text);
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  cursor: pointer;
+
+  transition:
+    border-color .15s ease,
+    background .15s ease,
+    transform .15s ease;
+}
+
+.screen .answer:hover {
+  border-color: #b9c2d2;
+  transform: translateX(2px);
+}
+
+.screen .answer.selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.screen .radio {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+}
+
+.screen .answer-text {
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .screen .answer-text {
