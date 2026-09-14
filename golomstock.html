@@ -149,7 +149,7 @@ function selectAnswer(value){
   renderQuestion();
 }
 
-function nextQuestion(){
+async function nextQuestion(){
   if(answers[questions[currentIndex].id] == null) return;
   if(currentIndex < questions.length - 1){
     currentIndex++;
@@ -159,7 +159,8 @@ function nextQuestion(){
     const completedAt = new Date().toISOString();
     const scores = Object.fromEntries(results.map(r => [r.code, r.percent]));
 
-    saveTestResult({
+    if (typeof saveTestResult === "function") {
+      await saveTestResult({
       testType: "golomstock",
       startedAt: testStartedAt,
       completedAt: completedAt,
@@ -168,7 +169,8 @@ function nextQuestion(){
         top: results.slice(0, 3)
       },
       answers: answers
-    });
+      });
+    }
 
     sessionStorage.setItem("profResult", JSON.stringify({
       testType: "golomstock",

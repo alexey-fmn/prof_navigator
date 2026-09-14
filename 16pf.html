@@ -183,7 +183,7 @@ $("backBtn").addEventListener("click",()=>{
   }
 });
 
-$("nextBtn").addEventListener("click",()=>{
+$("nextBtn").addEventListener("click",async()=>{
   if(answers[current]===null)return;
 
   if(current<questions.length-1){
@@ -218,7 +218,9 @@ const payload = {
 
 console.log("16PF payload перед отправкой:", payload);
 
-saveTestResult(payload);
+if (typeof saveTestResult === "function") {
+  await saveTestResult(payload);
+}
 
 sessionStorage.setItem("profResult", JSON.stringify({
   testType:"16pf",

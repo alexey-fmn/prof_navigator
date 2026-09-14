@@ -1235,13 +1235,13 @@
       nextButton.disabled = false;
     }
 
-    function nextQuestion() {
+    async function nextQuestion() {
       if (selectedAnswer === null) {
         return;
       }
 
       if (currentQuestionIndex >= shuffledQuestions.length - 1) {
-        calculateResult();
+        await calculateResult();
         return;
       }
 
@@ -1375,14 +1375,14 @@
       ];
     }
 
-  function renderResult() {
+  async function renderResult() {
       const scores = calculateScores();
       const sortedTypes = sortTypes(scores);
       const code = sortedTypes.slice(0, 3).join("");
       const completedAt = new Date().toISOString();
 
       if (typeof saveTestResult === "function") {
-        saveTestResult({
+        await saveTestResult({
           testType: "holland",
           startedAt: startedAt,
           completedAt: completedAt,
@@ -1421,12 +1421,12 @@
       window.location.href = "result.html";
     }
 
-    function calculateResult() {
+    async function calculateResult() {
       /*
        * Все 36 вопросов гарантированно имеют ответ,
        * так как кнопка перехода недоступна без выбора.
        */
-      renderResult();
+      await renderResult();
     }
 
     function restartTest() {
@@ -1446,8 +1446,8 @@
       initializeTest();
     });
 
-    nextButton.addEventListener("click", () => {
-      nextQuestion();
+    nextButton.addEventListener("click", async () => {
+      await nextQuestion();
     });
 
     /*
