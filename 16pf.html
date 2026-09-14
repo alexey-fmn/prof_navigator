@@ -207,16 +207,26 @@ $("nextBtn").addEventListener("click",()=>{
 
     window.scrollTo({top:0,behavior:"smooth"});
 
-    saveTestResult({
-      testType:"16pf",
-      startedAt:startedAt,
-      result:{
-        scores:resultData.scores,
-        profile:resultData.profile,
-        directions:resultData.directions
-      },
-      answers:answers
-    });
+    const completedAt = new Date().toISOString();
+
+const payload = {
+  testType: "16pf",
+  startedAt: startedAt,
+  completedAt: completedAt,
+
+  result: {
+    scores: resultData.scores,
+    profile: resultData.profile,
+    directions: resultData.directions
+  },
+
+  scores: resultData.scores,
+  answers: answers
+};
+
+console.log("16PF payload перед отправкой:", payload);
+
+saveTestResult(payload);
   }
 });
 
