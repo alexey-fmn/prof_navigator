@@ -89,23 +89,6 @@ h1{font-size:clamp(34px,7vw,56px);line-height:1.02;letter-spacing:-.04em;margin:
         </div>
       </div>
     </section>
-
-    <section id="resultScreen" class="screen hidden">
-      <div class="card">
-        <div class="result-head">
-          <div class="eyebrow">Твой результат</div>
-          <h1>Вот что тебе интересно</h1>
-          <p class="result-sub">Похоже, тебе особенно интересны эти виды деятельности. Это может быть хорошей точкой для изучения разных профессиональных направлений.</p>
-        </div>
-        <div class="results" id="results"></div>
-        <div class="cta">
-          <h2>А что это значит для будущей профессии?</h2>
-          <p>Интересы — только одна часть профиля. Чтобы понять, какие профессиональные направления могут тебе подойти, нужно посмотреть ещё на особенности личности, ценности и предпочтительную рабочую среду.</p>
-          <button class="primary" onclick="alert('Демонстрационная кнопка: подробный разбор пока недоступен.')">Получить подробный разбор</button>
-        </div>
-        <button class="restart" onclick="restartTest()">Пройти ещё раз</button>
-      </div>
-    </section>
   </main>
 </div>
 
@@ -122,7 +105,7 @@ let currentIndex = 0;
 let results = [];
 
 function show(id){
-  ["startScreen","testScreen","resultScreen"].forEach(x => document.getElementById(x).classList.add("hidden"));
+  ["startScreen","testScreen"].forEach(x => document.getElementById(x).classList.add("hidden"));
   document.getElementById(id).classList.remove("hidden");
 }
 
@@ -173,21 +156,26 @@ function nextQuestion(){
     renderQuestion();
   } else {
     calculateResults();
-    renderResults();
-    show("resultScreen");
-    window.scrollTo(0,0);
+    const completedAt = new Date().toISOString();
+    const scores = Object.fromEntries(results.map(r => [r.code, r.percent]));
 
     saveTestResult({
-  testType: "golomstock",
-  startedAt: testStartedAt,
-  result: {
-    scores: Object.fromEntries(
-      results.map(r => [r.code, r.percent])
-    ),
-    top: results.slice(0, 3)
-  },
-  answers: answers
-});
+      testType: "golomstock",
+      startedAt: testStartedAt,
+      completedAt: completedAt,
+      result: {
+        scores: scores,
+        top: results.slice(0, 3)
+      },
+      answers: answers
+    });
+
+    sessionStorage.setItem("profResult", JSON.stringify({
+      testType: "golomstock",
+      scores: scores,
+      top: results.slice(0, 3)
+    }));
+    window.location.href = "result.html";
   }
 }
 

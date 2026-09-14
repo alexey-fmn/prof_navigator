@@ -715,51 +715,6 @@
         </div>
       </section>
 
-      <!-- RESULT SCREEN -->
-      <section id="resultScreen" class="screen result-card hidden">
-
-        <div class="result-header">
-          <h2>Твой профиль профессиональных интересов</h2>
-
-          <p id="resultSummary"></p>
-
-          <div class="code-box">
-            <div class="code-label">Holland Code</div>
-            <div id="hollandCode" class="holland-code"></div>
-          </div>
-        </div>
-
-        <div>
-          <h3 class="section-title">Твои наиболее выраженные интересы</h3>
-          <div id="topTypes" class="top-types"></div>
-        </div>
-
-        <div>
-          <h3 class="section-title">Профиль всех шести типов</h3>
-          <div id="allScores" class="all-scores"></div>
-        </div>
-
-        <div class="meaning">
-          <h3 class="section-title">Что это может означать</h3>
-          <div id="meaningText"></div>
-        </div>
-
-        <div class="directions">
-          <div class="directions-title">
-            Потенциально интересные направления
-          </div>
-
-          <ul id="directionsList" class="directions-list"></ul>
-        </div>
-
-        <div class="result-actions">
-          <button id="restartButton" class="btn btn-primary">
-            Пройти ещё раз
-          </button>
-        </div>
-
-      </section>
-
     </div>
   </main>
 
@@ -1142,12 +1097,10 @@
     const startScreen = document.getElementById("startScreen");
     const instructionScreen = document.getElementById("instructionScreen");
     const testScreen = document.getElementById("testScreen");
-    const resultScreen = document.getElementById("resultScreen");
 
     const startButton = document.getElementById("startButton");
     const instructionStartButton = document.getElementById("instructionStartButton");
     const nextButton = document.getElementById("nextButton");
-    const restartButton = document.getElementById("restartButton");
 
     const questionCounter = document.getElementById("questionCounter");
     const progressPercent = document.getElementById("progressPercent");
@@ -1160,8 +1113,7 @@
       [
         startScreen,
         instructionScreen,
-        testScreen,
-        resultScreen
+        testScreen
       ].forEach((element) => {
         element.classList.add("hidden");
       });
@@ -1424,120 +1376,50 @@
     }
 
   function renderResult() {
-  const scores = calculateScores();
-  const sortedTypes = sortTypes(scores);
-  const code = sortedTypes.slice(0, 3).join("");
+      const scores = calculateScores();
+      const sortedTypes = sortTypes(scores);
+      const code = sortedTypes.slice(0, 3).join("");
+      const completedAt = new Date().toISOString();
 
-  // Holland Code
-  document.getElementById("hollandCode").textContent = code;
+      if (typeof saveTestResult === "function") {
+        saveTestResult({
+          testType: "holland",
+          startedAt: startedAt,
+          completedAt: completedAt,
+          result: {
+            scores: scores,
+            code: code,
+            top: sortedTypes.slice(0, 3).map((type) => ({
+              code: type,
+              name: typeData[type].name,
+              percent: scores[type]
+            }))
+          },
+          answers: answers
+        });
+      }
 
-  // Краткое описание результата
-  document.getElementById("resultSummary").textContent =
-    getResultSummary(sortedTypes, scores);
-
-  // ТОП-3 типа
-  const topTypesContainer = document.getElementById("topTypes");
-  topTypesContainer.innerHTML = "";
-
-  sortedTypes.slice(0, 3).forEach((type) => {
-    const item = document.createElement("div");
-    item.className = "top-type";
-
-    item.innerHTML = `
-      <div class="top-type-header">
-        <div class="type-title">
-          ${typeData[type].name}
-        </div>
-
-        <div class="type-score">
-          ${scores[type]}%
-        </div>
-      </div>
-
-      <p class="type-description">
-        ${typeData[type].description}
-      </p>
-    `;
-
-    topTypesContainer.appendChild(item);
-  });
-
-  // Все 6 типов
-  const allScoresContainer = document.getElementById("allScores");
-  allScoresContainer.innerHTML = "";
-
-  sortedTypes.forEach((type) => {
-    const row = document.createElement("div");
-    row.className = "score-row";
-
-    row.innerHTML = `
-      <div class="score-name">
-        ${typeData[type].name}
-      </div>
-
-      <div class="score-track">
-        <div
-          class="score-fill"
-          style="width: ${scores[type]}%"
-        ></div>
-      </div>
-
-      <div class="score-value">
-        ${scores[type]}%
-      </div>
-    `;
-
-    allScoresContainer.appendChild(row);
-  });
-
-  // Что означает результат
-  const meaningContainer = document.getElementById("meaningText");
-  meaningContainer.innerHTML = "";
-
-  const meaning = getMeaning(sortedTypes, scores);
-
-  meaning.forEach((text) => {
-    const p = document.createElement("p");
-    p.textContent = text;
-    meaningContainer.appendChild(p);
-  });
-
-  // Направления
-  const directionsContainer =
-    document.getElementById("directionsList");
-
-  directionsContainer.innerHTML = "";
-
-  const directions = getDirections(sortedTypes);
-
-  directions.forEach((direction) => {
-    const li = document.createElement("li");
-    li.textContent = direction;
-    directionsContainer.appendChild(li);
-  });
-
-  // Самое важное — показать экран результата
-  showScreen(resultScreen);
-
-  // Сохраняем результат
-  if (typeof saveTestResult === "function") {
-    saveTestResult({
-      testType: "holland",
-      startedAt: startedAt,
-      result: {
+      sessionStorage.setItem("profResult", JSON.stringify({
+        testType: "holland",
         scores: scores,
         code: code,
-        top: sortedTypes.slice(0, 3).map((type) => ({
-          code: type,
-          name: typeData[type].name,
-          percent: scores[type]
-        }))
-      },
-      answers: answers
-    });
-  }
-}
-
+        summary: getResultSummary(sortedTypes, scores),
+        top: sortedTypes.slice(0, 3).map(type => ({
+          code:type,
+          name:typeData[type].name,
+          percent:scores[type],
+          description:typeData[type].description
+        })),
+        all: sortedTypes.map(type => ({
+          code:type,
+          name:typeData[type].name,
+          percent:scores[type]
+        })),
+        meaning:getMeaning(sortedTypes, scores),
+        directions:getDirections(sortedTypes)
+      }));
+      window.location.href = "result.html";
+    }
 
     function calculateResult() {
       /*
@@ -1566,10 +1448,6 @@
 
     nextButton.addEventListener("click", () => {
       nextQuestion();
-    });
-
-    restartButton.addEventListener("click", () => {
-      restartTest();
     });
 
     /*

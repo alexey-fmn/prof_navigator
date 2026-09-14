@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Результат теста</title>
+<style>
+*{box-sizing:border-box}
+:root{--bg:#f5f7fb;--surface:#fff;--text:#172033;--muted:#6f788a;--border:#e4e8ef;--accent:#4f6df5;--accent-dark:#3e5bd8;--accent-soft:#eef1ff;--shadow:0 16px 45px rgba(31,42,68,.08)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.app{width:100%;min-height:100vh;padding:40px 20px}.card{width:min(820px,100%);margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:22px;box-shadow:var(--shadow);padding:46px}
+h1{margin:0 0 14px;font-size:clamp(32px,5vw,48px);line-height:1.08;letter-spacing:-1.3px}h2{font-size:22px;margin:32px 0 18px}p{line-height:1.6}.muted{color:var(--muted)}
+.top{margin-bottom:30px}.code{display:inline-block;margin-top:16px;padding:14px 22px;border-radius:16px;background:var(--accent-soft);color:var(--accent);font-size:28px;font-weight:800;letter-spacing:4px}
+.items{display:grid;gap:14px}.item{padding:20px;border:1px solid var(--border);border-radius:17px;background:#fff}.row{display:flex;justify-content:space-between;gap:14px;font-weight:800}.score{color:var(--accent);white-space:nowrap}.bar{height:9px;background:#e8ebf1;border-radius:99px;overflow:hidden;margin:11px 0}.bar i{display:block;height:100%;background:var(--accent);border-radius:inherit}.desc{margin:0;color:var(--muted);font-size:15px}
+.list{margin:0;padding-left:21px;color:var(--muted);line-height:1.7}.actions{margin-top:30px}.btn{border:0;border-radius:13px;padding:15px 25px;background:var(--accent);color:#fff;font:inherit;font-weight:700;cursor:pointer}.btn:hover{background:var(--accent-dark)}
+.empty{text-align:center}
+@media(max-width:640px){.app{padding:18px 12px}.card{padding:28px 20px;border-radius:18px}}
+</style>
+</head>
+<body>
+<main class="app"><section id="card" class="card"></section></main>
+<script>
+"use strict";
+const data=JSON.parse(sessionStorage.getItem("profResult")||"null");
+const card=document.getElementById("card");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const bar=(name,score,desc="")=>`<div class="item"><div class="row"><span>${esc(name)}</span><span class="score">${Number(score)||0}%</span></div><div class="bar"><i style="width:${Number(score)||0}%"></i></div>${desc?`<p class="desc">${esc(desc)}</p>`:""}</div>`;
+const testsButton=`<div class="actions"><button class="btn" onclick="location.href='tests.html'">К тестам</button></div>`;
+
+if(!data){
+ card.innerHTML=`<div class="empty"><h1>Результат не найден</h1>${testsButton}</div>`;
+}else if(data.testType==="holland"){
+ card.innerHTML=`
+ <div class="top"><h1>Твой профиль профессиональных интересов</h1><p class="muted">${esc(data.summary)}</p><div class="code">${esc(data.code)}</div></div>
+ <h2>Твои наиболее выраженные интересы</h2><div class="items">${data.top.map(x=>bar(x.name,x.percent,x.description)).join("")}</div>
+ <h2>Профиль всех шести типов</h2><div class="items">${data.all.map(x=>bar(x.name,x.percent)).join("")}</div>
+ <h2>Что это может означать</h2>${data.meaning.map(x=>`<p class="muted">${esc(x)}</p>`).join("")}
+ <h2>Потенциально интересные направления</h2><ul class="list">${data.directions.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ ${testsButton}`;
+}else if(data.testType==="golomstock"){
+ card.innerHTML=`
+ <div class="top"><h1>Вот что тебе интересно</h1><p class="muted">Похоже, тебе особенно интересны эти виды деятельности. Это может быть хорошей точкой для изучения разных профессиональных направлений.</p></div>
+ <div class="items">${data.top.map(x=>bar(x.name,x.percent,x.description)).join("")}</div>
+ ${testsButton}`;
+}else if(data.testType==="16pf"){
+ card.innerHTML=`
+ <div class="top"><p class="muted">Твой профессиональный стиль</p><h1>${esc(data.profile)}</h1><p class="muted">${esc(data.profileDesc)}</p></div>
+ <h2>Твой профиль</h2><div class="items">${Object.entries(data.scores).map(([n,v])=>bar(n,v)).join("")}</div>
+ <h2>Направления, которые стоит попробовать</h2><div class="items">${data.directions.map(x=>bar(x.name,x.score,"Может быть интересно исследовать это направление с учётом твоего общего профиля.")).join("")}</div>
+ ${testsButton}`;
+}else{
+ card.innerHTML=`<div class="empty"><h1>Результат не найден</h1>${testsButton}</div>`;
+}
+</script>
+</body>
+</html>

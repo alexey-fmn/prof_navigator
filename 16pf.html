@@ -48,13 +48,6 @@ h1{margin:0;font-size:clamp(32px,5vw,48px);line-height:1.08;letter-spacing:-1.5p
 <div class="nav"><button id="backBtn" class="secondary">← Назад</button><button id="nextBtn" class="primary" disabled>Далее →</button></div>
 </section>
 
-<section id="resultScreen" class="result-card hidden fade">
-<div class="result-head"><div class="result-kicker">Твой профессиональный стиль</div><h2 id="profileTitle" class="result-title"></h2><p id="profileDesc" class="result-desc"></p></div>
-<h3 class="section-title">Твой профиль</h3><div id="scales" class="scales"></div>
-<h3 class="section-title">Направления, которые стоит попробовать</h3><div id="directions" class="directions"></div>
-<div class="cta"><h3>Хочешь разобраться глубже?</h3><p>Этот результат показывает только общую картину. Более подробный разбор может помочь сопоставить твои интересы, личностный стиль, тип деятельности и профессиональные направления.</p><button id="detailsBtn" class="primary">Получить подробный разбор</button><div id="saveStatus" class="save-status"></div></div>
-<p class="note">Результат не определяет профессию и не является психологическим диагнозом. Это ориентир для дальнейшего исследования себя и разных профессиональных направлений.</p>
-</section>
 </main></div>
 
 <script src="js/save-result.js"></script>
@@ -123,7 +116,7 @@ const directionWeights={
 
 let current=0,answers=Array(questions.length).fill(null),startedAt=null;
 const $=id=>document.getElementById(id);
-const startScreen=$("startScreen"),testScreen=$("testScreen"),resultScreen=$("resultScreen");
+const startScreen=$("startScreen"),testScreen=$("testScreen");
 
 function renderQuestion(){
  const q=questions[current],pct=Math.round((current+1)/questions.length*100);
@@ -174,10 +167,8 @@ $("startBtn").addEventListener("click",()=>{
   current=0;
   answers=Array(questions.length).fill(null);
   startedAt=new Date().toISOString();
-  $("saveStatus").textContent="";
 
   startScreen.classList.add("hidden");
-  resultScreen.classList.add("hidden");
   testScreen.classList.remove("hidden");
 
   renderQuestion();
@@ -200,12 +191,13 @@ $("nextBtn").addEventListener("click",()=>{
     renderQuestion();
     window.scrollTo({top:0,behavior:"smooth"});
   }else{
-    const resultData=renderResult();
-
-    testScreen.classList.add("hidden");
-    resultScreen.classList.remove("hidden");
-
-    window.scrollTo({top:0,behavior:"smooth"});
+    const resultData={
+      scores: calculateScales()
+    };
+    resultData.profile=getProfile(resultData.scores);
+    resultData.directions=Object.entries(directionWeights)
+      .map(([name,weights])=>({name,score:directionScore(weights,resultData.scores)}))
+      .sort((a,b)=>b.score-a.score).slice(0,5);
 
     const completedAt = new Date().toISOString();
 
@@ -227,12 +219,18 @@ const payload = {
 console.log("16PF payload перед отправкой:", payload);
 
 saveTestResult(payload);
+
+sessionStorage.setItem("profResult", JSON.stringify({
+  testType:"16pf",
+  scores:resultData.scores,
+  profile:resultData.profile,
+  profileDesc:profiles[resultData.profile].desc,
+  directions:resultData.directions
+}));
+window.location.href="result.html";
   }
 });
 
-$("detailsBtn").addEventListener("click",()=>{
-  alert("Подробный разбор скоро будет доступен");
-});
 </script>
 </body>
 </html>
